@@ -100,6 +100,9 @@ async def Send_Email_Verification(
 
     Authorize.jwt_required()
     db_user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
+    
+    if db_user.is_verified:
+        return {'message': 'Email account is verified.'}
 
     db_user_verify = crud.user.generate_code(db, user_id=db_user.id)
 
@@ -117,15 +120,19 @@ async def Verify_Email_Account(
         Authorize: AuthJWT = Depends()):
 
     Authorize.jwt_required()
-    user_id = Authorize.get_jwt_subject()
+    db_user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
+    
+    if db_user.is_verified:
+        return {'message': 'Email account is verified.'}
 
-    verified = crud.user.verify_code(db, code=code, user_id=user_id)
-    if not verified:
+    code_verified = crud.user.verify_code(db, code=code, user_id=db_user.id)
+    if not code_verified:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=Responses.invalid_code
         )
 
-    return {'message': 'Account verified successfully.'}
+    return {'message': 'Email account verified successfully.'}
 
 
 class Responses(object):
@@ -159,5 +166,15 @@ class Responses(object):
                 "password"
             ],
             "msg": "Incorect email or password."
+        }
+    ]
+    
+    invalid_code = [
+        {
+            "loc": [
+                "body",
+                "code"
+            ],
+            "msg": "Code is invalid."
         }
     ]
