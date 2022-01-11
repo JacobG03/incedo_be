@@ -1,0 +1,14 @@
+{
+  "profiles": [
+      {
+          "name": "Default",
+          "detail": "Hide python related cache",
+          "hidden": [
+              ".vscode/",
+              "pytest_cache",
+              "*/__pycache__",
+              "*/*/__pycache__"
+          ]
+      }
+  ]
+}
