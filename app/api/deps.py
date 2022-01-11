@@ -9,5 +9,3 @@ def get_db() -> Generator:
         yield db
     finally:
         db.close()
-
-# get_verified_user

@@ -101,7 +101,7 @@ async def Send_Email_Verification(
     Authorize.jwt_required()
     db_user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
 
-    db_user_verify = crud.user.verify_code_new(db, user_id=db_user.id)
+    db_user_verify = crud.user.generate_code(db, user_id=db_user.id)
 
     email = schemas.Email(email=[db_user.email], body={
                           'code': db_user_verify.code})

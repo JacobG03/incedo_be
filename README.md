@@ -7,15 +7,18 @@
 
 - [ ] Unverified users
   - [ ] Allow unverified user to only call these endpoints:
-
-      Using a middleware would be the best solution by far.
-
     - [ ] Get Current User
     - [ ] Check if verified
-    - [ ] Send verifiation code
+    - [ ] Send verifiation email
       - [ ] Limit calls per day
     - [ ] Verify code
+
+      Eaither raise an HTTPException when user is supposed to be verified but isnt
+      or try to wrap auth & verify checking in a dependency and use that for most endpoints
+  
   - [ ] Delete account 24h after creation
+
+      Start a worker that will try to delete this account and its relative models after 24h if not verified
 
 - [ ] Themes
   - [ ] Change Theme (from pool of defaults + own themes)
@@ -27,7 +30,7 @@
   - [ ] beautify verify_email.html
 
 - [ ] Admin dashboard
-  - [ ] See users, update & deleted etc.
+  - [ ] See users, update & delete etc.
 
 - [ ] Better data validations
   - [ ] Check for same username by comparing lower case to lower case, but save string as given

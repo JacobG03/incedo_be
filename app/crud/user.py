@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app import schemas
 from app.crud.base import CRUDBase
-from app.models import User, Avatar, UserVerify
+from app.models import User, Avatar, EmailVerify
 from app.utils import verify_password, get_password_hash
 
 
@@ -60,17 +60,16 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
         
         return True
     
-    def verify_code_new(self, db: Session, user_id: int) -> schemas.UserVerifyDB:
-        # If verify object exists, delete & create new
-        db_ver = db.query(UserVerify).filter(UserVerify.user_id == user_id).first()
-        if db_ver:
-            db.delete(db_ver)
+    def generate_code(self, db: Session, user_id: int) -> schemas.EmailVerifyDB:
+        db_ver = db.query(EmailVerify).filter(EmailVerify.user_id == user_id).first()
+        if not db_ver:
+            db_ver = EmailVerify(user_id=user_id)
+            db.add(db_ver)
             db.commit()
+            db.refresh(db_ver)
         
-        db_ver = UserVerify(
-            user_id=user_id,
-            code=str(random.randint(1000, 9999))
-        )
+        db_ver.times_generated += 1
+        db_ver.code = random.randint(1000, 9999)
         
         db.add(db_ver)
         db.commit()
@@ -79,19 +78,17 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
         return db_ver
     
     def verify_code(self, db: Session, code: str, user_id: int) -> bool:
-        db_ver = db.query(UserVerify).filter(UserVerify.user_id == user_id).first()
+        db_ver = db.query(EmailVerify).filter(EmailVerify.user_id == user_id).first()
         if not db_ver:
             return False
         if db_ver.code != code:
             return False
+
+        db_user = self.get(db, model_id=user_id)
+        db_user.is_verified = True
+        db.add(db_user)
         
-        if db_ver.verifed:
-            return True
-        
-        db_ver.verified = True
-        db_ver.verified_time = datetime.utcnow()
-        
-        db.add(db_ver)
+        db.delete(db_ver)
         db.commit()
         
         return True

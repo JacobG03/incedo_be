@@ -50,6 +50,7 @@ class UserInDB(UserBase):
     hashed_password: str
     salt: str
     is_admin: bool
+    is_verified: bool
 
     class Config:
         orm_mode = True
@@ -57,6 +58,7 @@ class UserInDB(UserBase):
 
 class MeOut(BaseModel):
     username: str
+    is_verified: bool
     avatar_id: int
     theme_id: int
     
@@ -82,10 +84,8 @@ class UserUpdate(BaseModel):
     theme_id: Optional[int] = None
 
 
-class UserVerifyDB(BaseModel):
+class EmailVerifyDB(BaseModel):
     id: int
     user_id: int
     code: int
-    verified: bool
-    send_time: datetime
-    verified_time: datetime
+    times_generated: int

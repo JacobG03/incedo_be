@@ -78,6 +78,7 @@ class FirstAccount(BaseModel):
     password: str = os.environ.get('password')
     password2: str = os.environ.get('password')
     is_admin: bool = True
+    is_verified: bool = True
     
 
 class LogConfig(BaseModel):
