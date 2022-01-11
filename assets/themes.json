@@ -1,0 +1,22 @@
+{
+  "themes": [
+    {
+      "name": "nebula",
+      "bg": "#212135",
+      "main": "#be3c88",
+      "sub": "#19b3b8",
+      "info": "#78c729",
+      "text": "#838686",
+      "error": "#ca4754"
+    },
+    {
+      "name": "matrix",
+      "bg": "#000000",
+      "main": "#15ff00",
+      "sub": "003B00",
+      "info": "#78c729",
+      "text": "#adffa7",
+      "error": "#da3333"
+    }
+  ]
+}

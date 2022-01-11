@@ -1,14 +1,10 @@
 # Todos
 
-- [ ] Users
-  - [ ] User roles
-  - [ ] First user created by init will have an admin role
-
-- [ ] Themes
-  - [ ] Create
-  - [ ] Update
-    - [ ] Only themes with parent_id = user.id
-  - [ ] Use a new theme
+- [ ] Initialisation
+  - [x] Create multiple default themes with parent_id = None
+  - [x] Create first avatar model
+  - [x] Create first normal account
+  - [ ] Create first admin account
 
 - [ ] Unverified users
   - [ ] Allow unverified user to only call these endpoints:
@@ -22,10 +18,19 @@
     - [ ] Verify code
   - [ ] Delete account 24h after creation
 
+- [ ] Themes
+  - [ ] Change Theme (from pool of defaults + own themes)
+  - [ ] Create
+  - [ ] Update
+    - [ ] Only themes with parent_id = user.id
+
 - [ ] Email
   - [ ] beautify verify_email.html
 
 - [ ] Admin dashboard
   - [ ] See users, update & deleted etc.
+
+- [ ] Better data validations
+  - [ ] Check for same username by comparing lower case to lower case, but save string as given
 
 - [ ] Tests

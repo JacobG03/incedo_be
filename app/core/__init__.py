@@ -1,1 +1,3 @@
-from app.core.config import settings, LogConfig, JWTSettings, mail_settings, default_theme
+from app.core.config import settings, LogConfig, JWTSettings,\
+    mail_settings, default_theme, init_account
+

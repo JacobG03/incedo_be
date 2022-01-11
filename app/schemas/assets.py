@@ -9,6 +9,7 @@ class Email(BaseModel):
 
 class Theme(BaseModel):
     id: Optional[int] = None
+    parent_ud: Optional[int] = None
     name: str
     bg: str
     main: str

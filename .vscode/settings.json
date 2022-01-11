@@ -4,10 +4,6 @@
     "**/.svn": true,
     "**/.hg": true,
     "**/CVS": true,
-    "**/.DS_Store": true,
-    ".vscode/": true,
-    "pytest_cache": true,
-    "*/__pycache__": true,
-    "*/*/__pycache__": true
+    "**/.DS_Store": true
   }
 }
