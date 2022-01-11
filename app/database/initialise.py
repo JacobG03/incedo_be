@@ -8,7 +8,7 @@ from app import crud
 from app.database.session import engine
 from app.database.base import Base
 from app.models import Avatar, Theme
-from app.core import settings, init_account
+from app.core import settings, first_account
 
 
 logger = logging.getLogger('main')
@@ -21,7 +21,7 @@ def initialise(db: Session) -> None:
     # Populates first Avatar table (id = 1)
     setDefaultAvatar(db)
     # Populates first Theme table (id = 1)
-    setDefaultTheme(db)
+    setDefaultThemes(db)
     # Create own account
     createFirstAccount(db)
 
@@ -39,7 +39,7 @@ def setDefaultAvatar(db: Session) -> None:
     logger.info(f'Default Avatar has been created.\n{db_avatar}')
 
 
-def setDefaultTheme(db: Session) -> None:
+def setDefaultThemes(db: Session) -> None:
     with open(os.path.abspath('assets/themes.json'), 'r') as f:
         data = json.load(f)
         for theme in data['themes']:
@@ -52,6 +52,6 @@ def setDefaultTheme(db: Session) -> None:
     logger.info(f'{len(data["themes"])} themes in total.')
 
 
-def createFirstAccount(db: Session):
-    crud.user.create(db, obj_in=init_account)    
+def createFirstAccount(db: Session) -> None:
+    crud.user.create(db, obj_in=first_account)    
     logger.info(f'First account created.')

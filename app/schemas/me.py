@@ -49,6 +49,7 @@ class UserInDB(UserBase):
     theme_id: int
     hashed_password: str
     salt: str
+    is_admin: bool
 
     class Config:
         orm_mode = True

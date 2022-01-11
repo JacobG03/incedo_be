@@ -1,10 +1,9 @@
 # Todos
 
-- [ ] Initialisation
+- [x] Initialisation
   - [x] Create multiple default themes with parent_id = None
   - [x] Create first avatar model
-  - [x] Create first normal account
-  - [ ] Create first admin account
+  - [x] Create first account with attribute is_admin = True
 
 - [ ] Unverified users
   - [ ] Allow unverified user to only call these endpoints:
@@ -32,5 +31,10 @@
 
 - [ ] Better data validations
   - [ ] Check for same username by comparing lower case to lower case, but save string as given
+  - [ ] etc..
 
 - [ ] Tests
+
+## Ideas
+
+- [ ] Generate favicon based on 'bg' and main 'colors' (letter 'i' in a circle is enough)

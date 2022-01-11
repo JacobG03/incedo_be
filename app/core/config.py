@@ -1,5 +1,6 @@
 import secrets
 import os
+from typing import List
 from pydantic import BaseSettings, BaseModel
 from dotenv import load_dotenv
 
@@ -71,12 +72,13 @@ class DefaultTheme(BaseModel):
     error: str = '#ca4754'
 
 
-class InitAccount(BaseModel):
+class FirstAccount(BaseModel):
     username: str = os.environ.get('username')
     email: str = os.environ.get('email')
     password: str = os.environ.get('password')
     password2: str = os.environ.get('password')
-
+    is_admin: bool = True
+    
 
 class LogConfig(BaseModel):
     """Logging configuration to be set for the server"""
@@ -107,7 +109,7 @@ class LogConfig(BaseModel):
     }
 
 
-init_account = InitAccount()
+first_account = FirstAccount()
 settings = Settings()
 mail_settings = MailSettings()
 default_theme = DefaultTheme()
