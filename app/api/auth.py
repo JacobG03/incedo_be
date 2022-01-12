@@ -4,7 +4,7 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
 from app import schemas, crud
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
 from app.core import JWTSettings
 from app.utils import send_email_verification
 
@@ -93,34 +93,35 @@ def logout(Authorize: AuthJWT = Depends()):
     return {"message": "Successfully logged out."}
 
 
-@router.get('/verify_email')
+@router.get('/send_verification')
 async def Send_Email_Verification(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-    db_user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
+    db_user = get_current_user(db, Authorize)
     
     if db_user.is_verified:
         return {'message': 'Email account is verified.'}
 
     db_user_verify = crud.user.generate_code(db, user_id=db_user.id)
+    
+    if db_user_verify.times_generated >= 10:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     email = schemas.Email(email=[db_user.email], body={
                           'code': db_user_verify.code})
     await send_email_verification(email)
 
-    return {'message': 'Email verification sent.'}
+    return {'message': f'Email verification sent.'}
 
 
 @router.post('/verify_email')
-async def Verify_Email_Account(
+async def Verify_Email(
         code: str = Body(..., embed=True),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-    db_user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
+    db_user = get_current_user(db, Authorize)
     
     if db_user.is_verified:
         return {'message': 'Email account is verified.'}

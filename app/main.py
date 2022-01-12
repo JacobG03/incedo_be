@@ -26,5 +26,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     )
 
 
+from app import workers
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     EMAIL_MAX_LENGTH: int = 256
     PASSWORD_MIN_LENGTH: int = 6
     PASSWORD_MAX_LENGTH: int = 256
+    REMOVE_UNVERIFIED_INTERVAL: int = 60 * 60
+    MAX_UNVERIFIED_TIME: int = 60 * 60 * 24
 
     class Config:
         env_file = ".env"

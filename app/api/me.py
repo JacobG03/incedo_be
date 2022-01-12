@@ -5,7 +5,7 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
 from app import schemas, crud
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db, get_verified_user
 from app.models import Avatar
 
 
@@ -17,12 +17,7 @@ async def Get_Current_User(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    # get user
-    Authorize.jwt_required()
-    user_id = Authorize.get_jwt_subject()
-    user = crud.user.get(db, user_id)
-
-    return user
+    return get_current_user(db, Authorize)
 
 
 @router.put('', response_model=schemas.MeOut)
@@ -31,10 +26,7 @@ async def Update_Current_User(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-
-    user_id = Authorize.get_jwt_subject()
-    db_user = crud.user.get(db, user_id)
+    db_user = get_verified_user(db, Authorize) 
     updated_user = crud.user.update(db, db_obj=db_user, obj_in=updates)
 
     return updated_user
@@ -45,8 +37,7 @@ async def Get_Avatar(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-    db_user = crud.user.get(db, Authorize.get_jwt_subject())
+    db_user = get_current_user(db, Authorize)
     db_avatar = db.query(Avatar).get(db_user.avatar_id)
 
     return StreamingResponse(io.BytesIO(db_avatar.content), media_type='image/png')
@@ -58,11 +49,10 @@ async def Update_Avatar(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-    db_user = crud.user.get(db, Authorize.get_jwt_subject())
+    db_user = get_verified_user(db, Authorize)
 
     content = await avatar.read()
-    crud.user.update_avatar(db, content=content, user_in=db_user)
+    crud.user.update_avatar(db, content=content, db_user=db_user)
 
     return Response(status_code=status.HTTP_200_OK)
 
@@ -72,8 +62,7 @@ async def Get_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
-    db_user = crud.user.get(db, Authorize.get_jwt_subject())
+    db_user = get_current_user(db, Authorize)
     db_theme = crud.theme.get(db, model_id=db_user.theme_id)
 
     return db_theme
@@ -85,16 +74,17 @@ async def Change_Theme(
     db: Session = Depends(get_db),
     Authorize: AuthJWT = Depends()):
 
-    Authorize.jwt_required()
+    db_user = get_verified_user(db, Authorize)
     
+    # Check if theme exists
     db_theme = crud.theme.get(db, model_id=id)
     if not db_theme:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     
-    user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
-    user.theme_id = id
-    db.add(user)
+    # Update currently selected theme
+    db_user.theme_id = id
+    db.add(db_user)
     db.commit()
-    db.refresh(user)
+    db.refresh(db_user)
     
     return db_theme

@@ -51,6 +51,7 @@ class UserInDB(UserBase):
     salt: str
     is_admin: bool
     is_verified: bool
+    timestamp: datetime
 
     class Config:
         orm_mode = True

@@ -21,10 +21,9 @@
       Start a worker that will try to delete this account and its relative models after 24h if not verified
 
 - [ ] Themes
-  - [ ] Change Theme (from pool of defaults + own themes)
+  - [x] Change Theme (from pool of defaults + own themes)
   - [ ] Create
   - [ ] Update
-    - [ ] Only themes with parent_id = user.id
 
 - [ ] Email
   - [ ] beautify verify_email.html

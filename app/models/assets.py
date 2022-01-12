@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, LargeBinary, String, ForeignKey
+from sqlalchemy import Column, Integer, LargeBinary, String
 
 from app.database.base import Base
 

@@ -1,5 +1,7 @@
+from datetime import datetime
 import random
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.sql.sqltypes import DateTime
 
 from app.database.base import Base
 
@@ -14,6 +16,7 @@ class User(Base):
     is_verified = Column(Boolean, default=False, nullable=False)
     avatar_id = Column(Integer, ForeignKey('avatar.id'), nullable=True)
     is_admin = Column(Boolean, default=False, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self):
         return f'{self.id}, {self.username}'

@@ -1,12 +1,13 @@
 import bcrypt
 import random
-from typing import BinaryIO, Optional
+from typing import BinaryIO, List, Optional
 from sqlalchemy.orm import Session
 from datetime import datetime
 
 from app import schemas
 from app.crud.base import CRUDBase
 from app.models import User, Avatar, EmailVerify
+from app.schemas.user import UserInDB
 from app.utils import verify_password, get_password_hash
 
 
@@ -36,6 +37,22 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
         
         return db_user
     
+    def remove(self, db: Session, db_user: UserInDB) -> bool:
+        email_verify_obj = db.query(EmailVerify).filter(
+            EmailVerify.user_id == db_user.id).first()
+
+        if email_verify_obj:
+            db.delete(email_verify_obj)
+
+        avatar = db.query(Avatar).get(db_user.avatar_id)
+        db.delete(avatar)
+
+        db.delete(db_user)
+        db.commit()
+        
+        return True
+        
+    
     def get_by_username(self, db: Session, username: str) -> Optional[User]:
         return db.query(self.model).filter(self.model.username == username).one_or_none()
     
@@ -50,8 +67,8 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
             return None
         return user
     
-    def update_avatar(self, db: Session, content: BinaryIO, user_in: schemas.UserInDB) -> None:
-        db_avatar = db.query(Avatar).get(user_in.avatar_id)
+    def update_avatar(self, db: Session, content: BinaryIO, db_user: schemas.UserInDB) -> None:
+        db_avatar = db.query(Avatar).get(db_user.avatar_id)
         db_avatar.content = content
         
         db.add(db_avatar)
@@ -92,5 +109,8 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
         db.commit()
         
         return True
+
+    def get_all_unverified(self, db: Session) -> List[schemas.UserInDB]:
+        return db.query(User).filter(User.is_verified == False).all()
 
 user = CRUDUser(User)
