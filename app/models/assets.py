@@ -13,7 +13,6 @@ class Avatar(Base):
 
 class Theme(Base):
     id = Column(Integer, primary_key=True, index=True)
-    parent_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     name = Column(String, unique=True, nullable=False)
     bg = Column(String, nullable=False)
     main = Column(String, nullable=False)

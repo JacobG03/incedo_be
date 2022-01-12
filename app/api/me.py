@@ -1,5 +1,5 @@
 import io
-from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException, Response
+from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException, Response, Body
 from starlette.responses import StreamingResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
@@ -42,13 +42,13 @@ async def Update_Current_User(
 
 @router.get('/avatar', tags=['Avatar'])
 async def Get_Avatar(
-    db: Session = Depends(get_db),
-    Authorize: AuthJWT = Depends()):
-        
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+
     Authorize.jwt_required()
     db_user = crud.user.get(db, Authorize.get_jwt_subject())
     db_avatar = db.query(Avatar).get(db_user.avatar_id)
-    
+
     return StreamingResponse(io.BytesIO(db_avatar.content), media_type='image/png')
 
 
@@ -60,7 +60,7 @@ async def Update_Avatar(
 
     Authorize.jwt_required()
     db_user = crud.user.get(db, Authorize.get_jwt_subject())
-    
+
     content = await avatar.read()
     crud.user.update_avatar(db, content=content, user_in=db_user)
 
@@ -69,12 +69,32 @@ async def Update_Avatar(
 
 @router.get('/theme', tags=['Theme'], response_model=schemas.Theme)
 async def Get_Theme(
-    db: Session = Depends(get_db),
-    Authorize: AuthJWT = Depends()):
-    
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+
     Authorize.jwt_required()
     db_user = crud.user.get(db, Authorize.get_jwt_subject())
     db_theme = crud.theme.get(db, model_id=db_user.theme_id)
-    
+
     return db_theme
 
+
+@router.put('/theme', tags=['Theme'], response_model=schemas.Theme)
+async def Change_Theme(
+    id: int = Body(..., embed=True),
+    db: Session = Depends(get_db),
+    Authorize: AuthJWT = Depends()):
+
+    Authorize.jwt_required()
+    
+    db_theme = crud.theme.get(db, model_id=id)
+    if not db_theme:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    user = crud.user.get(db, model_id=Authorize.get_jwt_subject())
+    user.theme_id = id
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    
+    return db_theme
