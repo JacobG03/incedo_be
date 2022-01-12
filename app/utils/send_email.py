@@ -1,4 +1,5 @@
 import os
+from fastapi import BackgroundTasks
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 
 from app import schemas
@@ -19,7 +20,7 @@ conf = ConnectionConfig(
 )
 
 
-async def send_email_verification(email: schemas.Email):
+def send_email_verification(email: schemas.Email, bg: BackgroundTasks):
     message = MessageSchema(
         subject='Incedo Account Verification Code',
         recipients=email.dict().get('email'),
@@ -28,4 +29,4 @@ async def send_email_verification(email: schemas.Email):
 
     fm = FastMail(conf)
 
-    await fm.send_message(message, template_name='verify_email.html')
+    bg.add_task(fm.send_message, message=message, template_name='verify_email.html')

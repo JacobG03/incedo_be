@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter, status, Depends, HTTPException, Body
+from fastapi import APIRouter, status, Depends, HTTPException, Body, BackgroundTasks
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
@@ -95,22 +95,29 @@ def logout(Authorize: AuthJWT = Depends()):
 
 @router.get('/send_verification')
 async def Send_Email_Verification(
+        background_tasks: BackgroundTasks,
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
     db_user = get_current_user(db, Authorize)
-    
+
     if db_user.is_verified:
         return {'message': 'Email account is verified.'}
 
     db_user_verify = crud.user.generate_code(db, user_id=db_user.id)
-    
+
     if db_user_verify.times_generated >= 10:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
-    email = schemas.Email(email=[db_user.email], body={
-                          'code': db_user_verify.code})
-    await send_email_verification(email)
+    theme = crud.theme.get(db, db_user.theme_id)
+    email = schemas.Email(
+        email=[db_user.email],
+        body={
+            'code': db_user_verify.code,
+            'theme': theme
+        })
+    
+    send_email_verification(email, background_tasks)
 
     return {'message': f'Email verification sent.'}
 
@@ -122,7 +129,7 @@ async def Verify_Email(
         Authorize: AuthJWT = Depends()):
 
     db_user = get_current_user(db, Authorize)
-    
+
     if db_user.is_verified:
         return {'message': 'Email account is verified.'}
 
@@ -169,7 +176,7 @@ class Responses(object):
             "msg": "Incorect email or password."
         }
     ]
-    
+
     invalid_code = [
         {
             "loc": [

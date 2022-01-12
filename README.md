@@ -30,7 +30,7 @@
 
 - [ ] Better data validations
   - [ ] Check for same username by comparing lower case to lower case, but save string as given
-  - [ ] etc..
+  - [x] Avatar upload validation
 
 - [ ] Admin dashboard
   - [ ] See accounts & delete accounts
