@@ -24,7 +24,8 @@ class Settings(BaseSettings):
 
     # User related
     AVATAR_PATH: str = 'assets/images/default_avatar.jpg'
-    MAX_AVATAR_SIZE: int = 256000       # 256kb
+    AVATAR_SIZE: int = 256
+    MAX_AVATAR_SIZE: int = 2000000       # 2MB
     USERNAME_MIN_LENGTH: int = 3
     USERNAME_MAX_LENGTH: int = 32
     EMAIL_MAX_LENGTH: int = 256

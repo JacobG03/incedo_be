@@ -1,4 +1,5 @@
 import io
+from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException, Response, Body
 from starlette.responses import StreamingResponse
 from fastapi_jwt_auth import AuthJWT
@@ -7,6 +8,7 @@ from sqlalchemy.orm import Session
 from app import schemas, crud
 from app.api.deps import get_current_user, get_db, get_verified_user
 from app.models import Avatar
+from app.core import settings
 
 
 router = APIRouter()
@@ -50,8 +52,17 @@ async def Update_Avatar(
 
     db_user = get_verified_user(db, Authorize)
 
-    content = await avatar.read()
-    crud.user.update_avatar(db, content=content, db_user=db_user)
+    try:
+        binary = await avatar.read()
+        image = Image.open(io.BytesIO(binary))
+        im_resized = image.resize(size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
+        buf = io.BytesIO()
+        im_resized.save(buf, format=image.format)
+        byte_im = buf.getvalue()
+    except UnidentifiedImageError:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    
+    crud.user.update_avatar(db, content=byte_im, db_user=db_user)
 
     return Response(status_code=status.HTTP_200_OK)
 

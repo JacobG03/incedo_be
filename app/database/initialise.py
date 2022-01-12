@@ -1,6 +1,8 @@
 import json
 import os
 import logging
+from PIL import Image
+from io import BytesIO
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 
@@ -27,16 +29,19 @@ def initialise(db: Session) -> None:
 
 
 def setDefaultAvatar(db: Session) -> None:
-    with open(os.path.abspath(settings.AVATAR_PATH), 'rb') as f:
-        content = f.read()
-
-    db_avatar = Avatar(content=content)
+    with BytesIO() as output:
+        with Image.open(os.path.abspath(settings.AVATAR_PATH)) as img:
+            resized = img.resize(size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
+            resized.save(output, 'png')
+        data = output.getvalue()
+    
+    db_avatar = Avatar(content=data)
 
     db.add(db_avatar)
     db.commit()
     db.refresh(db_avatar)
 
-    logger.info(f'Default Avatar has been created.\n{db_avatar}')
+    logger.info(f'Default Avatar has been created.')
 
 
 def setDefaultThemes(db: Session) -> None:
@@ -49,7 +54,6 @@ def setDefaultThemes(db: Session) -> None:
     db.commit()
 
     logger.info(f'Default Themes have been created.')
-    logger.info(f'{len(data["themes"])} themes in total.')
 
 
 def createFirstAccount(db: Session) -> None:
