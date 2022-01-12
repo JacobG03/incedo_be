@@ -26,10 +26,21 @@ async def Update_Current_User(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    db_user = get_verified_user(db, Authorize) 
+    db_user = get_verified_user(db, Authorize)
     updated_user = crud.user.update(db, db_obj=db_user, obj_in=updates)
 
     return updated_user
+
+
+@router.delete('')
+async def Delete_Account(
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+    
+    db_user = get_current_user(db, Authorize)
+    crud.user.remove(db, db_user)
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get('/avatar', tags=['Avatar'])
@@ -70,21 +81,21 @@ async def Get_Theme(
 
 @router.put('/theme', tags=['Theme'], response_model=schemas.Theme)
 async def Change_Theme(
-    id: int = Body(..., embed=True),
-    db: Session = Depends(get_db),
-    Authorize: AuthJWT = Depends()):
+        id: int = Body(..., embed=True),
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
 
     db_user = get_verified_user(db, Authorize)
-    
+
     # Check if theme exists
     db_theme = crud.theme.get(db, model_id=id)
     if not db_theme:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     # Update currently selected theme
     db_user.theme_id = id
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    
+
     return db_theme
