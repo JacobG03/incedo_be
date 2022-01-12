@@ -4,6 +4,7 @@ from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 
 from app import schemas
 from app.core import mail_settings
+from app.schemas import Theme
 
 
 conf = ConnectionConfig(
@@ -20,13 +21,40 @@ conf = ConnectionConfig(
 )
 
 
-def send_email_verification(email: schemas.Email, bg: BackgroundTasks):
+def send_email_verification(email: schemas.Email, user: schemas.UserInDB, bg: BackgroundTasks):
+    theme = Theme(**email.body['theme'])
+    code = email.body['code']
+
     message = MessageSchema(
         subject='Incedo Account Verification Code',
         recipients=email.dict().get('email'),
-        template_body=email.dict().get('body')
+        html=f"""
+        <html>
+        <body style="background-color: {theme.bg}; width: 100%; font-size: 1.25rem; padding: 2rem 0">
+            <table style="background-color: rgba(0,0,0,0.1); border-radius: 4px; height: 75%; padding: 1rem 2rem; max-width: 320px; margin-left: auto; margin-right: auto;">
+                <tr style="height: 100px;">
+                    <td style="width: 100%; padding: 0 1rem; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.sub}; text-align: center; width: 100%; font-size: 2.5rem"><i><b>Incedo</b></i></p>
+                    </td>
+                </tr>
+                <tr style="height: 160px;">
+                    <td style="width: 100%; height: 140px; margin: auto; padding: 0 1rem; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.text}; text-align: center; width: 100%;">Thanks for signing up,</p>
+                        <p style="color: {theme.sub}; font-size: 1.5rem; width: 100%; text-align: center;"><i><b>{user.username}</b></i></p>
+                    </td>
+                </tr>
+                <tr style="height: 180px;">
+                    <td style="width: 100%; height: 160px; margin: auto; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.text}; text-align: center; width: 100%;">Here's your code:</p>
+                        <p style="color: {theme.main}; text-align: center; width: fit-content; margin: auto; padding: 1.25rem 3rem; font-size: 2rem; background-color: rgba(0,0,0,0.1); border-radius: 4px;">{code}</p>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
     )
 
     fm = FastMail(conf)
 
-    bg.add_task(fm.send_message, message=message, template_name='verify_email.html')
+    bg.add_task(fm.send_message, message=message)

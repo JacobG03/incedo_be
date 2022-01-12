@@ -1,5 +1,6 @@
 import logging
 from fastapi import APIRouter, status, Depends, HTTPException, Body, BackgroundTasks
+from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
@@ -114,10 +115,10 @@ async def Send_Email_Verification(
         email=[db_user.email],
         body={
             'code': db_user_verify.code,
-            'theme': theme
+            'theme': jsonable_encoder(theme)
         })
     
-    send_email_verification(email, background_tasks)
+    send_email_verification(email, db_user, background_tasks)
 
     return {'message': f'Email verification sent.'}
 
