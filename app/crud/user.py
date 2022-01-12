@@ -12,13 +12,13 @@ from app.utils import verify_password, get_password_hash
 
 
 class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
-    def create(self, db: Session, *, obj_in: schemas.UserCreate) -> User:
+    def create(self, db: Session, *, obj_in: schemas.UserCreate) -> schemas.UserInDB:
         salt = bcrypt.gensalt().decode()
         hashed_password = get_password_hash(obj_in.password + salt)
-        
+
         # Create user's avatar
         default_avatar = db.query(Avatar).get(1)
-        avatar = Avatar(content=default_avatar.content)    
+        avatar = Avatar(content=default_avatar.content)
         db.add(avatar)
         db.commit()
         db.refresh(avatar)
@@ -30,13 +30,13 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
             hashed_password=hashed_password,
             avatar_id=avatar.id
         )
-        
+
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        
+
         return db_user
-    
+
     def remove(self, db: Session, db_user: UserInDB) -> bool:
         email_verify_obj = db.query(EmailVerify).filter(
             EmailVerify.user_id == db_user.id).first()
@@ -49,53 +49,54 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         db.delete(db_user)
         db.commit()
-        
+
         return True
-        
-    
-    def get_by_username(self, db: Session, username: str) -> Optional[User]:
+
+    def get_by_username(self, db: Session, username: str) -> Optional[schemas.UserInDB]:
         return db.query(self.model).filter(self.model.username == username).one_or_none()
-    
-    def get_by_email(self, db: Session, email: str) -> Optional[User]:
+
+    def get_by_email(self, db: Session, email: str) -> Optional[schemas.UserInDB]:
         return db.query(self.model).filter(self.model.email == email).one_or_none()
-    
-    def authenticate(self, db: Session, email: str, password: str) -> Optional[User]:
+
+    def authenticate(self, db: Session, email: str, password: str) -> Optional[schemas.UserInDB]:
         user = self.get_by_email(db, email)
         if not user:
             return None
         if not verify_password(password + user.salt, user.hashed_password):
             return None
         return user
-    
+
     def update_avatar(self, db: Session, content: BinaryIO, db_user: schemas.UserInDB) -> None:
         db_avatar = db.query(Avatar).get(db_user.avatar_id)
         db_avatar.content = content
-        
+
         db.add(db_avatar)
         db.commit()
         db.refresh(db_avatar)
-        
+
         return True
-    
+
     def generate_code(self, db: Session, user_id: int) -> schemas.EmailVerifyDB:
-        db_ver = db.query(EmailVerify).filter(EmailVerify.user_id == user_id).first()
+        db_ver = db.query(EmailVerify).filter(
+            EmailVerify.user_id == user_id).first()
         if not db_ver:
             db_ver = EmailVerify(user_id=user_id)
             db.add(db_ver)
             db.commit()
             db.refresh(db_ver)
-        
+
         db_ver.times_generated += 1
         db_ver.code = random.randint(1000, 9999)
-        
+
         db.add(db_ver)
         db.commit()
         db.refresh(db_ver)
-        
+
         return db_ver
-    
+
     def verify_code(self, db: Session, code: str, user_id: int) -> bool:
-        db_ver = db.query(EmailVerify).filter(EmailVerify.user_id == user_id).first()
+        db_ver = db.query(EmailVerify).filter(
+            EmailVerify.user_id == user_id).first()
         if not db_ver:
             return False
         if db_ver.code != code:
@@ -104,13 +105,14 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
         db_user = self.get(db, model_id=user_id)
         db_user.is_verified = True
         db.add(db_user)
-        
+
         db.delete(db_ver)
         db.commit()
-        
+
         return True
 
     def get_all_unverified(self, db: Session) -> List[schemas.UserInDB]:
-        return db.query(User).filter(User.is_verified == False).all()
+        return db.query(self.model).filter(self.model.is_verified == False).all()
+
 
 user = CRUDUser(User)

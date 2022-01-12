@@ -14,7 +14,7 @@ logger = logging.getLogger('main')
 
 
 @app.on_event("startup")
-@repeat_every(settings.REMOVE_UNVERIFIED_INTERVAL)  # 6 hours
+@repeat_every(seconds=settings.REMOVE_UNVERIFIED_INTERVAL)  # 6 hours
 def remove_unverified_users() -> None:
     db: Session = SessionLocal()
     db_users = crud.user.get_all_unverified(db)
