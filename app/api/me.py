@@ -20,18 +20,6 @@ async def Get_Current_User(
     return get_current_user(db, Authorize)
 
 
-@router.put('', response_model=schemas.MeOut)
-async def Update_Current_User(
-        updates: schemas.UserUpdate,
-        db: Session = Depends(get_db),
-        Authorize: AuthJWT = Depends()):
-
-    db_user = get_verified_user(db, Authorize)
-    updated_user = crud.user.update(db, db_obj=db_user, obj_in=updates)
-
-    return updated_user
-
-
 @router.delete('')
 async def Delete_Account(
         db: Session = Depends(get_db),
