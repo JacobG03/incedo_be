@@ -5,7 +5,8 @@ from fastapi_jwt_auth import AuthJWT
 from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
-from app import schemas, crud
+from app import crud
+from app.schemas import _user, _assets
 from app.api.deps import get_current_user, get_db
 from app.core import JWTSettings, settings
 from app.utils import send_email_verification, send_password_reset
@@ -22,7 +23,7 @@ router = APIRouter()
 
 @router.post('/register', status_code=status.HTTP_201_CREATED)
 async def Create_User(
-        user_in: schemas.UserCreate,
+        user_in: _user.UserCreate,
         Authorize: AuthJWT = Depends(),
         db: Session = Depends(get_db)):
 
@@ -68,7 +69,7 @@ async def Create_User(
 
 @router.post('/login')
 def login(
-        user: schemas.UserLogin,
+        user: _user.UserLogin,
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
@@ -112,7 +113,7 @@ async def Send_Email_Verification(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
     theme = crud.theme.get(db, db_user.theme_id)
-    email = schemas.Email(
+    email = _assets.Email(
         email=[db_user.email],
         body={
             'code': db_user_verify.code,
@@ -160,7 +161,7 @@ async def Send_Password_Reset(
         return Response(status_code=status.HTTP_200_OK)
 
     theme = crud.theme.get(db, db_user.theme_id)
-    email = schemas.Email(
+    email = _assets.Email(
         email=[db_user.email],
         body={
             'url': f'{settings.URL_FE}/reset_password/{db_pass_reset.uri}',
@@ -174,7 +175,7 @@ async def Send_Password_Reset(
 @router.post('/reset_passwords/{uri}')
 async def Reset_Passwords_Via_Email(
         uri: str,
-        passwords: schemas.ResetPasswords,
+        passwords: _user.ResetPasswords,
         db: Session = Depends(get_db)):
 
     if not crud.user.reset_password(db, passwords, uri):

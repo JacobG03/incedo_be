@@ -5,7 +5,8 @@ from starlette.responses import StreamingResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
-from app import schemas, crud
+from app import crud
+from app.schemas import _user, _assets
 from app.api.deps import get_current_user, get_db, get_verified_user
 from app.models import Avatar
 from app.core import settings
@@ -14,7 +15,7 @@ from app.core import settings
 router = APIRouter()
 
 
-@router.get('', response_model=schemas.MeOut)
+@router.get('', response_model=_user.MeOut)
 async def Get_Current_User(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
@@ -68,7 +69,7 @@ async def Update_Avatar(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@router.get('/theme', tags=['Theme'], response_model=schemas.Theme)
+@router.get('/theme', tags=['Theme'], response_model=_assets.Theme)
 async def Get_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
@@ -79,7 +80,7 @@ async def Get_Theme(
     return db_theme
 
 
-@router.put('/theme', tags=['Theme'], response_model=schemas.Theme)
+@router.put('/theme', tags=['Theme'], response_model=_assets.Theme)
 async def Change_Theme(
         id: int = Body(..., embed=True),
         db: Session = Depends(get_db),

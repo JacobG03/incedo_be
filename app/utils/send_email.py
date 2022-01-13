@@ -2,9 +2,8 @@ import os
 from fastapi import BackgroundTasks
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 
-from app import schemas
 from app.core import mail_settings
-from app.schemas import Theme
+from app.schemas import _assets, _user
 
 
 conf = ConnectionConfig(
@@ -21,8 +20,8 @@ conf = ConnectionConfig(
 )
 
 
-def send_email_verification(email: schemas.Email, user: schemas.UserInDB, bg: BackgroundTasks):
-    theme = Theme(**email.body['theme'])
+def send_email_verification(email: _assets.Email, user: _user.UserInDB, bg: BackgroundTasks):
+    theme = _assets.Theme(**email.body['theme'])
     code = email.body['code']
 
     message = MessageSchema(
@@ -60,8 +59,8 @@ def send_email_verification(email: schemas.Email, user: schemas.UserInDB, bg: Ba
     bg.add_task(fm.send_message, message=message)
 
 
-def send_password_reset(email: schemas.Email, user: schemas.UserInDB, bg: BackgroundTasks):
-    theme = Theme(**email.body['theme'])
+def send_password_reset(email: _assets.Email, user: _user.UserInDB, bg: BackgroundTasks):
+    theme = _assets.Theme(**email.body['theme'])
     url = email.body['url']
 
     message = MessageSchema(

@@ -5,16 +5,15 @@ from typing import BinaryIO, List, Optional
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from app import schemas
 from app.crud.base import CRUDBase
 from app.models import User, Avatar, EmailVerify, PasswordReset
-from app.schemas.user import UserInDB
+from app.schemas import _assets, _user
 from app.utils import verify_password, get_password_hash
 from app.core import settings
 
 
-class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
-    def create(self, db: Session, *, obj_in: schemas.UserCreate) -> schemas.UserInDB:
+class CRUDUser(CRUDBase[User, _user.UserCreate, _user.UserUpdate]):
+    def create(self, db: Session, *, obj_in: _user.UserCreate) -> _user.UserInDB:
         salt = bcrypt.gensalt().decode()
         hashed_password = get_password_hash(obj_in.password + salt)
 
@@ -39,7 +38,7 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         return db_user
 
-    def remove(self, db: Session, db_user: UserInDB) -> bool:
+    def remove(self, db: Session, db_user: _user.UserInDB) -> bool:
         email_verify_obj = db.query(EmailVerify).filter(
             EmailVerify.user_id == db_user.id).first()
 
@@ -54,13 +53,13 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         return True
 
-    def get_by_username(self, db: Session, username: str) -> Optional[schemas.UserInDB]:
+    def get_by_username(self, db: Session, username: str) -> Optional[_user.UserInDB]:
         return db.query(self.model).filter(self.model.username == username).one_or_none()
 
-    def get_by_email(self, db: Session, email: str) -> Optional[schemas.UserInDB]:
+    def get_by_email(self, db: Session, email: str) -> Optional[_user.UserInDB]:
         return db.query(self.model).filter(self.model.email == email).one_or_none()
 
-    def authenticate(self, db: Session, email: str, password: str) -> Optional[schemas.UserInDB]:
+    def authenticate(self, db: Session, email: str, password: str) -> Optional[_user.UserInDB]:
         user = self.get_by_email(db, email)
         if not user:
             return None
@@ -68,7 +67,7 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
             return None
         return user
 
-    def update_avatar(self, db: Session, content: BinaryIO, db_user: schemas.UserInDB) -> None:
+    def update_avatar(self, db: Session, content: BinaryIO, db_user: _user.UserInDB) -> None:
         db_avatar = db.query(Avatar).get(db_user.avatar_id)
         db_avatar.content = content
 
@@ -78,7 +77,7 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         return True
 
-    def generate_code(self, db: Session, user_id: int) -> schemas.EmailVerifyDB:
+    def generate_code(self, db: Session, user_id: int) -> _user.EmailVerifyDB:
         db_ver = db.query(EmailVerify).filter(
             EmailVerify.user_id == user_id).first()
         if not db_ver:
@@ -113,10 +112,10 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         return True
 
-    def get_all_unverified(self, db: Session) -> List[schemas.UserInDB]:
+    def get_all_unverified(self, db: Session) -> List[_user.UserInDB]:
         return db.query(self.model).filter(self.model.is_verified == False).all()
 
-    def new_password_reset(self, db: Session, db_user: schemas.UserInDB) -> PasswordReset:
+    def new_password_reset(self, db: Session, db_user: _user.UserInDB) -> PasswordReset:
         db_reset_password = db.query(PasswordReset).filter(
             PasswordReset.user_id == db_user.id).first()
 
@@ -139,7 +138,7 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
         return db_reset_password
 
-    def reset_password(self, db: Session, passwords: schemas.ResetPasswords, uri: str) -> bool:
+    def reset_password(self, db: Session, passwords: _user.ResetPasswords, uri: str) -> bool:
         db_reset_password = db.query(PasswordReset).filter(
             PasswordReset.uri == uri).first()
         if not db_reset_password or db_reset_password.suspended:
