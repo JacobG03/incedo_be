@@ -39,15 +39,23 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _user.UserUpdate]):
         return db_user
 
     def remove(self, db: Session, db_user: _user.UserInDB) -> bool:
+        # Remove PasswordReset row
+        db_pass_reset = db.query(PasswordReset).filter(
+            PasswordReset.user_id == db_user.id).first()
+        if db_pass_reset:
+            db.delete(db_pass_reset)
+    
+        # Remove EmailVerify row
         email_verify_obj = db.query(EmailVerify).filter(
             EmailVerify.user_id == db_user.id).first()
-
         if email_verify_obj:
             db.delete(email_verify_obj)
 
+        # Remove Avatar row
         avatar = db.query(Avatar).get(db_user.avatar_id)
         db.delete(avatar)
 
+        # Finally remove user
         db.delete(db_user)
         db.commit()
 

@@ -61,15 +61,10 @@ class MeOut(BaseModel):
     username: str
     is_verified: bool
     avatar_id: int
-    theme_id: int
 
     @validator('avatar_id')
     def return_avatar_url(cls, v):
         return f'{settings.URL}/me/avatar'
-
-    @validator('theme_id')
-    def return_theme_url(cls, v):
-        return f'{settings.URL}/me/theme'
 
     class Config:
         orm_mode = True
