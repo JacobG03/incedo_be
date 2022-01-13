@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm.session import Session
 
 from app import crud
-from app.models import EmailVerify, Avatar
+from app.models import PasswordReset
 from app.utils import repeat_every
 from app.main import app
 from app.database import SessionLocal
@@ -25,5 +25,19 @@ def remove_unverified_users() -> None:
             crud.user.remove(db, db_user)
             removed += 1
 
-    if removed > 0:
-        logger.info(f'Removed {removed} unverified accounts.')
+    logger.info(f'Removed {removed} unverified accounts.')
+
+
+@app.on_event("startup")
+@repeat_every(seconds=settings.REMOVE_PASS_RESETS_INTERVAL)
+def remove_suspended_password_resets() -> None:
+    db: Session = SessionLocal()
+
+    removable = db.query(PasswordReset).filter(
+        PasswordReset.suspended == True).all()
+    for i in removable:
+        db.delete(i)
+
+    db.commit()
+
+    logger.info(f'Cleaned up {len(removable)} suspended password resets.')

@@ -17,6 +17,7 @@ logger = logging.getLogger('main')
 
 load_dotenv()
 
+
 def initialise(db: Session) -> None:
     Base.metadata.create_all(bind=engine)
 
@@ -31,10 +32,11 @@ def initialise(db: Session) -> None:
 def setDefaultAvatar(db: Session) -> None:
     with BytesIO() as output:
         with Image.open(os.path.abspath(settings.AVATAR_PATH)) as img:
-            resized = img.resize(size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
+            resized = img.resize(
+                size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
             resized.save(output, 'png')
         data = output.getvalue()
-    
+
     db_avatar = Avatar(content=data)
 
     db.add(db_avatar)
@@ -57,5 +59,5 @@ def setDefaultThemes(db: Session) -> None:
 
 
 def createFirstAccount(db: Session) -> None:
-    crud.user.create(db, obj_in=first_account)    
+    crud.user.create(db, obj_in=first_account)
     logger.info(f'First account created.')

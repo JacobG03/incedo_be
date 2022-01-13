@@ -16,7 +16,7 @@ class Theme(BaseModel):
     info: str
     text: str
     error: str
-    
+
     class Config:
         orm_mode = True
 

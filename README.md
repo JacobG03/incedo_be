@@ -25,12 +25,14 @@
   - [ ] ~~Create~~
   - [ ] ~~Update~~
 
-- [ ] Email
-  - [ ] beautify verify_email.html
+- [x] Email
+  - [x] beautify verify_email.html
 
 - [ ] Better data validations
   - [ ] Check for same username by comparing lower case to lower case, but save string as given
   - [x] Avatar upload validation
+
+- [ ] Reset password via email
 
 - [ ] Admin dashboard
   - [ ] See accounts & delete accounts

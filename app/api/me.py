@@ -26,10 +26,10 @@ async def Get_Current_User(
 async def Delete_Account(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
-    
+
     db_user = get_current_user(db, Authorize)
     crud.user.remove(db, db_user)
-    
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -55,13 +55,14 @@ async def Update_Avatar(
     try:
         binary = await avatar.read()
         image = Image.open(io.BytesIO(binary))
-        im_resized = image.resize(size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
+        im_resized = image.resize(
+            size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
         buf = io.BytesIO()
         im_resized.save(buf, format=image.format)
         byte_im = buf.getvalue()
     except UnidentifiedImageError:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    
+
     crud.user.update_avatar(db, content=byte_im, db_user=db_user)
 
     return Response(status_code=status.HTTP_200_OK)

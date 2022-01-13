@@ -7,8 +7,10 @@ from typing import Callable, Optional, Awaitable
 
 logger = logging.getLogger('main')
 
-# Copied from code shared on Gitter (https://gitter.im/tiangolo/fastapi) by @dmontagu 
-# Decorator for fastapi 
+
+
+# Copied from code shared on Gitter (https://gitter.im/tiangolo/fastapi) by @dmontagu
+# Decorator for fastapi
 def repeat_every(*, seconds: float, wait_first: bool = False):
     def decorator(func: Callable[[], Optional[Awaitable[None]]]):
         is_coroutine = asyncio.iscoroutinefunction(func)

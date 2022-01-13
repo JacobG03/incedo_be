@@ -58,3 +58,42 @@ def send_email_verification(email: schemas.Email, user: schemas.UserInDB, bg: Ba
     fm = FastMail(conf)
 
     bg.add_task(fm.send_message, message=message)
+
+
+def send_password_reset(email: schemas.Email, user: schemas.UserInDB, bg: BackgroundTasks):
+    theme = Theme(**email.body['theme'])
+    url = email.body['url']
+
+    message = MessageSchema(
+        subject='Incedo Account Password Reset',
+        recipients=email.dict().get('email'),
+        html=f"""
+        <html>
+        <body style="background-color: {theme.bg}; width: 100%; font-size: 1.25rem; padding: 2rem 0">
+            <table style="background-color: rgba(0,0,0,0.1); border-radius: 4px; height: 75%; padding: 1rem 2rem; max-width: 320px; margin-left: auto; margin-right: auto;">
+                <tr style="height: 100px;">
+                    <td style="width: 100%; padding: 0 1rem; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.sub}; text-align: center; width: 100%; font-size: 2.5rem"><i><b>Incedo</b></i></p>
+                    </td>
+                </tr>
+                <tr style="height: 160px;">
+                    <td style="width: 100%; height: 140px; margin: auto; padding: 0 1rem; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.text}; text-align: center; width: 100%;">Reset your password, </p>
+                        <p style="color: {theme.sub}; font-size: 1.5rem; width: 100%; text-align: center;"><i><b>{user.username}</b></i></p>
+                    </td>s
+                </tr>
+                <tr style="height: 180px;">
+                    <td style="width: 100%; height: 160px; margin: auto; border-radius: 4px; background-color: {theme.bg};">
+                        <p style="color: {theme.text}; text-align: center; width: 100%;">Enter this url:</button>
+                        <p style="color: {theme.main}; text-align: center; width: fit-content; margin: auto; padding: 1.25rem 2rem; font-size: 1rem; background-color: rgba(0,0,0,0.1); border-radius: 4px;">{url}</p>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+    )
+
+    fm = FastMail(conf)
+
+    bg.add_task(fm.send_message, message=message)

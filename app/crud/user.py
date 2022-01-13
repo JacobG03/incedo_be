@@ -1,14 +1,16 @@
+import secrets
 import bcrypt
 import random
 from typing import BinaryIO, List, Optional
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app import schemas
 from app.crud.base import CRUDBase
-from app.models import User, Avatar, EmailVerify
+from app.models import User, Avatar, EmailVerify, PasswordReset
 from app.schemas.user import UserInDB
 from app.utils import verify_password, get_password_hash
+from app.core import settings
 
 
 class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
@@ -113,6 +115,48 @@ class CRUDUser(CRUDBase[User, schemas.UserCreate, schemas.UserUpdate]):
 
     def get_all_unverified(self, db: Session) -> List[schemas.UserInDB]:
         return db.query(self.model).filter(self.model.is_verified == False).all()
+
+    def new_password_reset(self, db: Session, db_user: schemas.UserInDB) -> PasswordReset:
+        db_reset_password = db.query(PasswordReset).filter(
+            PasswordReset.user_id == db_user.id).first()
+
+        if not db_reset_password:
+            db_reset_password = PasswordReset(user_id=db_user.id)
+            db.add(db_reset_password)
+            db.commit()
+            db.refresh(db_reset_password)
+
+        db_reset_password.times += 1
+        if db_reset_password.times >= settings.MAX_PASS_RESET_ATTEMPTS:
+            db_reset_password.suspended = True
+
+        db_reset_password.timestamp = datetime.utcnow()
+        db_reset_password.uri = secrets.token_urlsafe(256)
+
+        db.add(db_reset_password)
+        db.commit()
+        db.refresh(db_reset_password)
+
+        return db_reset_password
+
+    def reset_password(self, db: Session, passwords: schemas.ResetPasswords, uri: str) -> bool:
+        db_reset_password = db.query(PasswordReset).filter(
+            PasswordReset.uri == uri).first()
+        if not db_reset_password or db_reset_password.suspended:
+            return False
+        if db_reset_password.timestamp + timedelta(minutes=settings.PASS_RESET_MINUTES) < datetime.utcnow():
+            return False
+
+        db_user = db.query(self.model).get(db_reset_password.user_id)
+        hashed_password = get_password_hash(passwords.password + db_user.salt)
+
+        db_user.hashed_password = hashed_password
+
+        db.delete(db_reset_password)
+        db.add(db_user)
+        db.commit()
+
+        return True
 
 
 user = CRUDUser(User)

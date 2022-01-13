@@ -6,7 +6,7 @@ from app.database.base import Base
 class Avatar(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(LargeBinary)
-    
+
     def __repr__(self):
         return f'{self.id}'
 
@@ -20,6 +20,6 @@ class Theme(Base):
     info = Column(String, nullable=False)
     text = Column(String, nullable=False)
     error = Column(String, nullable=False)
-    
+
     def __repr__(self):
-      return f'{self.id}, {self.name}'
+        return f'{self.id}, {self.name}'

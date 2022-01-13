@@ -24,14 +24,15 @@ def get_current_user(db: Session, Authorize: AuthJWT) -> schemas.UserInDB:
 
     return db_user
 
+
 def get_verified_user(db: Session, Authorize: AuthJWT) -> schemas.UserInDB:
     Authorize.jwt_required()
     db_user = crud.user.get(db, Authorize.get_jwt_subject())
     if not db_user:
         Authorize.unset_jwt_cookies()
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    
+
     if not db_user.is_verified:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-    
+
     return db_user

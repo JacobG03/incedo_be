@@ -25,7 +25,6 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
         content={"detail": exc.message}
     )
 
-
 from app import workers
 
 if __name__ == "__main__":

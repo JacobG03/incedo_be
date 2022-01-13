@@ -1,13 +1,14 @@
 import logging
-from fastapi import APIRouter, status, Depends, HTTPException, Body, BackgroundTasks
+from fastapi import APIRouter, status, Depends, HTTPException, Body, BackgroundTasks, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
+from pydantic.networks import EmailStr
 from sqlalchemy.orm import Session
 
 from app import schemas, crud
 from app.api.deps import get_current_user, get_db
-from app.core import JWTSettings
-from app.utils import send_email_verification
+from app.core import JWTSettings, settings
+from app.utils import send_email_verification, send_password_reset
 
 
 @AuthJWT.load_config
@@ -117,7 +118,7 @@ async def Send_Email_Verification(
             'code': db_user_verify.code,
             'theme': jsonable_encoder(theme)
         })
-    
+
     send_email_verification(email, db_user, background_tasks)
 
     return {'message': f'Email verification sent.'}
@@ -142,6 +143,44 @@ async def Verify_Email(
         )
 
     return {'message': 'Email account verified successfully.'}
+
+
+@router.post('/send_password_reset')
+async def Send_Password_Reset(
+        background_tasks: BackgroundTasks,
+        email: EmailStr = Body(..., embed=True),
+        db: Session = Depends(get_db)):
+
+    db_user = crud.user.get_by_email(db, email)
+    if not db_user:
+        return Response(status_code=status.HTTP_200_OK)
+
+    db_pass_reset = crud.user.new_password_reset(db, db_user)
+    if db_pass_reset.suspended:
+        return Response(status_code=status.HTTP_200_OK)
+
+    theme = crud.theme.get(db, db_user.theme_id)
+    email = schemas.Email(
+        email=[db_user.email],
+        body={
+            'url': f'{settings.URL_FE}/reset_password/{db_pass_reset.uri}',
+            'theme': jsonable_encoder(theme)
+        })
+
+    send_password_reset(email, db_user, background_tasks)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@router.post('/reset_passwords/{uri}')
+async def Reset_Passwords_Via_Email(
+        uri: str,
+        passwords: schemas.ResetPasswords,
+        db: Session = Depends(get_db)):
+
+    if not crud.user.reset_password(db, passwords, uri):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return Response(status_code=status.HTTP_200_OK)
 
 
 class Responses(object):

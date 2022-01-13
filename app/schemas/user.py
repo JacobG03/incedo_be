@@ -8,7 +8,7 @@ from app.core import settings
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-    
+
     @validator('username')
     def validateUsernameLength(cls, v):
         if len(v) < settings.USERNAME_MIN_LENGTH:
@@ -16,7 +16,7 @@ class UserBase(BaseModel):
         elif len(v) > settings.USERNAME_MAX_LENGTH:
             raise ValueError('Username is too long.')
         return v
-    
+
     @validator('email')
     def validateEmailLength(cls, v):
         if len(v) > settings.EMAIL_MAX_LENGTH:
@@ -27,7 +27,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
     password2: str
-    
+
     @validator('password')
     def validatePasswordLength(cls, v):
         if len(v) > settings.PASSWORD_MAX_LENGTH:
@@ -35,7 +35,7 @@ class UserCreate(UserBase):
         elif len(v) < settings.PASSWORD_MIN_LENGTH:
             raise ValueError('Password is too short.')
         return v
-    
+
     @validator('password2')
     def passwords_match(cls, v, values, **kwargs):
         if 'password' in values and v != values['password']:
@@ -62,15 +62,15 @@ class MeOut(BaseModel):
     is_verified: bool
     avatar_id: int
     theme_id: int
-    
+
     @validator('avatar_id')
     def return_avatar_url(cls, v):
         return f'{settings.URL}/me/avatar'
-    
+
     @validator('theme_id')
     def return_theme_url(cls, v):
         return f'{settings.URL}/me/theme'
-    
+
     class Config:
         orm_mode = True
 
@@ -90,3 +90,22 @@ class EmailVerifyDB(BaseModel):
     user_id: int
     code: int
     times_generated: int
+
+
+class ResetPasswords(BaseModel):
+    password: str
+    password2: str
+
+    @validator('password')
+    def validatePasswordLength(cls, v):
+        if len(v) > settings.PASSWORD_MAX_LENGTH:
+            raise ValueError('Password is too long.')
+        elif len(v) < settings.PASSWORD_MIN_LENGTH:
+            raise ValueError('Password is too short.')
+        return v
+
+    @validator('password2')
+    def passwords_match(cls, v, values, **kwargs):
+        if 'password' in values and v != values['password']:
+            raise ValueError('Passwords do not match.')
+        return v

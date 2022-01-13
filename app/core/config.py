@@ -1,6 +1,5 @@
 import secrets
 import os
-from typing import List
 from pydantic import BaseSettings, BaseModel
 from dotenv import load_dotenv
 
@@ -11,6 +10,7 @@ load_dotenv()
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Incedo"
     URL: str
+    URL_FE: str = 'http://localhost:3000'
 
     # Database related
     SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL', '').replace(
@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     ALGORITHM: str = 'HS256'
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+
+    MAX_PASS_RESET_ATTEMPTS: int = 5
+    PASS_RESET_MINUTES: int = 10
+    REMOVE_PASS_RESETS_INTERVAL: int = 60 * 60
 
     # User related
     AVATAR_PATH: str = 'assets/images/default_avatar.jpg'
@@ -82,7 +86,7 @@ class FirstAccount(BaseModel):
     password2: str = os.environ.get('password')
     is_admin: bool = True
     is_verified: bool = True
-    
+
 
 class LogConfig(BaseModel):
     """Logging configuration to be set for the server"""
