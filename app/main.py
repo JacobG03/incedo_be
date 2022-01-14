@@ -1,6 +1,7 @@
 import uvicorn
 from logging.config import dictConfig
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.responses import JSONResponse
 
@@ -12,6 +13,20 @@ from app.api import api_router
 dictConfig(LogConfig().dict())
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+
+origins = [
+    "https://www.incedo.me/",
+    "http://localhost",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.add_middleware(LimitUploadSize, max_upload_size=settings.MAX_AVATAR_SIZE)
 
