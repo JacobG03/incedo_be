@@ -37,8 +37,8 @@ async def Get_User(
     return db_user
 
 
-@router.get('/{username}/avatar')
-async def Get_User(
+@router.get('/{username}/avatar', tags=['Avatar'])
+async def Get_User_Avatar(
         username: str,
         db: Session = Depends(get_db)):
 
@@ -51,8 +51,8 @@ async def Get_User(
     return StreamingResponse(io.BytesIO(db_avatar.content), media_type='image/png')
 
 
-@router.get('/{username}/theme', response_model=_assets.Theme)
-async def Get_Theme(
+@router.get('/{username}/theme', response_model=_assets.Theme, tags=['Theme'])
+async def Get_User_Theme(
         username: str,
         db: Session = Depends(get_db)):
 
