@@ -73,6 +73,10 @@ async def Update_Avatar(
 async def Get_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
+    
+    user_id = Authorize.get_jwt_subject()
+    if not user_id:
+        return crud.theme.get(db, model_id=1)
 
     db_user = get_current_user(db, Authorize)
     db_theme = crud.theme.get(db, model_id=db_user.theme_id)
@@ -86,7 +90,7 @@ async def Change_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    db_user = get_verified_user(db, Authorize)
+    db_user = get_current_user(db, Authorize)
 
     # Check if theme exists
     db_theme = crud.theme.get(db, model_id=id)
