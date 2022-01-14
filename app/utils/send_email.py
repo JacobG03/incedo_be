@@ -15,8 +15,7 @@ conf = ConnectionConfig(
     MAIL_FROM_NAME=mail_settings.MAIL_FROM_NAME,
     MAIL_TLS=True,
     MAIL_SSL=False,
-    USE_CREDENTIALS=True,
-    TEMPLATE_FOLDER=os.path.abspath('assets/emails')
+    USE_CREDENTIALS=True
 )
 
 
