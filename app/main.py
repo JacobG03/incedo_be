@@ -16,7 +16,7 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 
 origins = [
-    "https://www.incedo.me/",
+    "https://www.incedo.me",
     "http://localhost",
 ]
 
