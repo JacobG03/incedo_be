@@ -2,5 +2,4 @@ venv/
 .env
 hide-fies.json
 sql_app.db
-Procfile
 __pycache__/
