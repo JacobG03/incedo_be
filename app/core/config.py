@@ -54,6 +54,8 @@ class JWTSettings(BaseSettings):
     authjwt_cookie_csrf_protect: bool = True
     
     authjwt_cookie_samesite: str = 'none'
+    
+    authjwt_cookie_domain: str = 'incedo.me'
 
     class Config:
         env_file = '.env'
