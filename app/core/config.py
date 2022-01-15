@@ -55,7 +55,7 @@ class JWTSettings(BaseSettings):
     
     authjwt_cookie_samesite: str = 'none'
     
-    authjwt_cookie_domain: str = 'incedo.me'
+    authjwt_cookie_domain: str = 'hungry-lovelace-2dff69.netlify.app'
 
     class Config:
         env_file = '.env'
