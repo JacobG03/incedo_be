@@ -30,11 +30,13 @@ class Settings(BaseSettings):
     AVATAR_PATH: str = 'assets/images/default_avatar.jpg'
     AVATAR_SIZE: int = 256
     MAX_AVATAR_SIZE: int = 2000000       # 2MB
+    
     USERNAME_MIN_LENGTH: int = 3
     USERNAME_MAX_LENGTH: int = 32
     EMAIL_MAX_LENGTH: int = 256
     PASSWORD_MIN_LENGTH: int = 6
     PASSWORD_MAX_LENGTH: int = 256
+    
     REMOVE_UNVERIFIED_INTERVAL: int = 60 * 60
     MAX_UNVERIFIED_TIME: int = 60 * 60 * 24
 
@@ -50,7 +52,8 @@ class JWTSettings(BaseSettings):
     authjwt_cookie_secure: bool = True
     # Enable csrf double submit protection. default is True
     authjwt_cookie_csrf_protect: bool = True
-    autjwt_cookie_domain: str
+    
+    authjwt_cookie_samesite: str = 'none'
 
     class Config:
         env_file = '.env'

@@ -1,9 +1,10 @@
 import uvicorn
 from logging.config import dictConfig
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi.responses import JSONResponse
+from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware import Middleware
 
 from app.core import settings, LogConfig
 from app.middleware import LimitUploadSize
@@ -12,23 +13,21 @@ from app.api import api_router
 
 dictConfig(LogConfig().dict())
 
-app = FastAPI(title=settings.PROJECT_NAME)
-
 
 origins = [
     "https://www.incedo.me",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:8000"
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+middleware = [
+    Middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
+               allow_methods=["*"],
+               allow_headers=["*"]),
+    Middleware(LimitUploadSize, max_upload_size=settings.MAX_AVATAR_SIZE)
+]
 
-app.add_middleware(LimitUploadSize, max_upload_size=settings.MAX_AVATAR_SIZE)
+app = FastAPI(title=settings.PROJECT_NAME, middleware=middleware)
 
 app.include_router(api_router)
 
