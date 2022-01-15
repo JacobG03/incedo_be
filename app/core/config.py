@@ -50,6 +50,7 @@ class JWTSettings(BaseSettings):
     authjwt_cookie_secure: bool = True
     # Enable csrf double submit protection. default is True
     authjwt_cookie_csrf_protect: bool = True
+    autjwt_cookie_domain: str = 'hungry-lovelace-2dff69.netlify.app.'
 
     class Config:
         env_file = '.env'
