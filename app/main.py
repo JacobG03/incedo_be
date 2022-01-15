@@ -17,8 +17,7 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 origins = [
     "https://www.incedo.me",
-    "http://localhost",
-    "*"
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
