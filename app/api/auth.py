@@ -122,7 +122,7 @@ async def Send_Email_Verification(
 
     send_email_verification(email, db_user, background_tasks)
 
-    return {'message': f'Email verification sent.'}
+    return {'message': f'Email verification sent. {db_user_verify.times_generated} / 10.'}
 
 
 @router.post('/verify_email')
@@ -167,7 +167,6 @@ async def Send_Password_Reset(
             'url': f'{settings.URL_FE}/reset_password/{db_pass_reset.uri}',
             'theme': jsonable_encoder(theme)
         })
-
     send_password_reset(email, db_user, background_tasks)
     return Response(status_code=status.HTTP_200_OK)
 

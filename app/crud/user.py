@@ -3,11 +3,12 @@ import bcrypt
 import random
 from typing import BinaryIO, List, Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import datetime, timedelta
 
 from app.crud.base import CRUDBase
 from app.models import User, Avatar, EmailVerify, PasswordReset
-from app.schemas import _assets, _user
+from app.schemas import _user
 from app.utils import verify_password, get_password_hash
 from app.core import settings
 
@@ -44,7 +45,7 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _user.UserUpdate]):
             PasswordReset.user_id == db_user.id).first()
         if db_pass_reset:
             db.delete(db_pass_reset)
-    
+
         # Remove EmailVerify row
         email_verify_obj = db.query(EmailVerify).filter(
             EmailVerify.user_id == db_user.id).first()
@@ -62,10 +63,10 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _user.UserUpdate]):
         return True
 
     def get_by_username(self, db: Session, username: str) -> Optional[_user.UserInDB]:
-        return db.query(self.model).filter(self.model.username == username).one_or_none()
+        return db.query(self.model).filter(func.lower(self.model.username) == func.lower(username)).one_or_none()
 
     def get_by_email(self, db: Session, email: str) -> Optional[_user.UserInDB]:
-        return db.query(self.model).filter(self.model.email == email).one_or_none()
+        return db.query(self.model).filter(func.lower(self.model.email) == func.lower(email)).one_or_none()
 
     def authenticate(self, db: Session, email: str, password: str) -> Optional[_user.UserInDB]:
         user = self.get_by_email(db, email)

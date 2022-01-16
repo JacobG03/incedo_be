@@ -1,10 +1,8 @@
 # Todos
 
-- [ ] Better data valdation (for example: compare username.lower() to username.lower() but save as given)
+- [x] Better data valdation (for example: compare username.lower() to username.lower() but save as given)
 
 - [ ] Use POSTGRESQL on local intead of sqlite
-
-- [ ] Try to find a better way to store/access/update/delete Themes & Avatars
 
 - [ ] Admin dashboard
   - [ ] See accounts & delete accounts
