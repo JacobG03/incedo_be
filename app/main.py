@@ -17,7 +17,7 @@ dictConfig(LogConfig().dict())
 origins = [
     "https://www.incedo.me",
     "http://localhost:3000",
-    "http://localhost:8000"
+    "http://192.168.2.56:3000"
 ]
 
 middleware = [

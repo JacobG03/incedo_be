@@ -83,6 +83,7 @@ def login(
     access_token = Authorize.create_access_token(subject=user.id)
     refresh_token = Authorize.create_refresh_token(subject=user.id)
     # Set the JWT and CSRF double submit cookies in the response
+
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
     return {"message": "Successfully logged in."}
