@@ -18,7 +18,7 @@ conf = ConnectionConfig(
 )
 
 
-def send_email_verification(email: _assets.Email, user: _user.UserInDB, bg: BackgroundTasks):
+async def send_email_verification(email: _assets.Email, user: _user.UserInDB):
     theme = _assets.Theme(**email.body['theme'])
     code = email.body['code']
 
@@ -54,7 +54,7 @@ def send_email_verification(email: _assets.Email, user: _user.UserInDB, bg: Back
 
     fm = FastMail(conf)
 
-    bg.add_task(fm.send_message, message=message)
+    await fm.send_message(message)
 
 
 def send_password_reset(email: _assets.Email, user: _user.UserInDB, bg: BackgroundTasks):

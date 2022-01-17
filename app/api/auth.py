@@ -99,7 +99,6 @@ def logout(Authorize: AuthJWT = Depends()):
 
 @router.get('/send_verification')
 async def Send_Email_Verification(
-        background_tasks: BackgroundTasks,
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
@@ -121,14 +120,8 @@ async def Send_Email_Verification(
             'theme': jsonable_encoder(theme)
         })
 
-    send_email_verification(email, db_user, background_tasks)
-    email2 = _assets.Email(
-        email=[db_user.email],
-        body={
-            'url': f'{settings.URL_FE}/reset_password/test',
-            'theme': jsonable_encoder(theme)
-        })
-    send_password_reset(email2, db_user, background_tasks)
+    await send_email_verification(email, db_user)
+    
     return {'message': f'Email verification sent. {db_user_verify.times_generated} / 10.'}
 
 
