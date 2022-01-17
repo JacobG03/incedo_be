@@ -17,7 +17,7 @@ conf = ConnectionConfig(
     MAIL_SERVER=mail_settings.MAIL_SERVER,
     MAIL_FROM_NAME=mail_settings.MAIL_FROM_NAME,
     MAIL_TLS=True,
-    MAIL_SSL=True,
+    MAIL_SSL=False,
     USE_CREDENTIALS=True
 )
 
