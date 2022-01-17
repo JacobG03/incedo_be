@@ -55,7 +55,7 @@ class JWTSettings(BaseSettings):
     # Only allow JWT cookies to be sent over https
     authjwt_cookie_secure: bool = True
     # Enable csrf double submit protection. default is True
-    authjwt_cookie_csrf_protect: bool = False
+    authjwt_cookie_csrf_protect: bool = True
 
     authjwt_cookie_domain: str = 'incedo.me'
 
