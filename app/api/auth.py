@@ -122,7 +122,13 @@ async def Send_Email_Verification(
         })
 
     send_email_verification(email, db_user, background_tasks)
-
+    email2 = _assets.Email(
+        email=[db_user.email],
+        body={
+            'url': f'{settings.URL_FE}/reset_password/test',
+            'theme': jsonable_encoder(theme)
+        })
+    send_password_reset(email2, db_user, background_tasks)
     return {'message': f'Email verification sent. {db_user_verify.times_generated} / 10.'}
 
 
