@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     URL_FE: str
 
     # Database related
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL', '').replace(
+    SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL').replace(
         'postgres://', 'postgresql://') or \
         'sqlite:///./sql_app.db'
 
@@ -43,7 +43,6 @@ class Settings(BaseSettings):
     PASSWORD_MIN_LENGTH: int = 6
     PASSWORD_MAX_LENGTH: int = 256
     
-
     class Config:
         env_file = ".env"
 
@@ -73,17 +72,7 @@ class MailSettings(BaseSettings):
 
     class Config:
         env_file = ".env"
-
-
-class DefaultTheme(BaseModel):
-    name: str = 'nebula'
-    bg: str = '#212135'
-    main: str = '#be3c88'
-    sub: str = '#19b3b8'
-    info: str = '#78c729'
-    text: str = '#838686'
-    error: str = '#ca4754'
-
+        
 
 class FirstAccount(BaseModel):
     username: str = os.environ.get('username')
@@ -126,4 +115,3 @@ class LogConfig(BaseModel):
 first_account = FirstAccount()
 settings = Settings()
 mail_settings = MailSettings()
-default_theme = DefaultTheme()
