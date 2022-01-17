@@ -172,7 +172,7 @@ async def Send_Password_Reset(
     return Response(status_code=status.HTTP_200_OK)
 
 
-@router.post('/reset_passwords/{uri}')
+@router.post('/reset_password/{uri}')
 async def Reset_Passwords_Via_Email(
         uri: str,
         passwords: _user.ResetPasswords,
