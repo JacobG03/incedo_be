@@ -10,7 +10,7 @@ load_dotenv()
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Incedo"
     URL: str
-    URL_FE: str = 'http://localhost:3000'
+    URL_FE: str
 
     # Database related
     SQLALCHEMY_DATABASE_URI: str = os.environ.get('DATABASE_URL', '').replace(
@@ -22,9 +22,15 @@ class Settings(BaseSettings):
     ALGORITHM: str = 'HS256'
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # API's
     MAX_PASS_RESET_ATTEMPTS: int = 5
     PASS_RESET_MINUTES: int = 10
+    
+    # Workers
     REMOVE_PASS_RESETS_INTERVAL: int = 60 * 60
+    
+    REMOVE_UNVERIFIED_INTERVAL: int = 60 * 60
+    MAX_UNVERIFIED_TIME: int = 60 * 60 * 24
 
     # User related
     AVATAR_PATH: str = 'assets/images/default_avatar.jpg'
@@ -37,8 +43,6 @@ class Settings(BaseSettings):
     PASSWORD_MIN_LENGTH: int = 6
     PASSWORD_MAX_LENGTH: int = 256
     
-    REMOVE_UNVERIFIED_INTERVAL: int = 60 * 60
-    MAX_UNVERIFIED_TIME: int = 60 * 60 * 24
 
     class Config:
         env_file = ".env"
@@ -51,10 +55,9 @@ class JWTSettings(BaseSettings):
     # Only allow JWT cookies to be sent over https
     authjwt_cookie_secure: bool = True
     # Enable csrf double submit protection. default is True
-    authjwt_cookie_csrf_protect: bool = True
+    authjwt_cookie_csrf_protect: bool = False
 
     authjwt_cookie_domain: str = 'incedo.me'
-    
 
     class Config:
         env_file = '.env'
