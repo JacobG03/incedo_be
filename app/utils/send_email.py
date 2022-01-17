@@ -1,9 +1,12 @@
-import os
+import logging
 from fastapi import BackgroundTasks
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 
 from app.core import mail_settings
 from app.schemas import _assets, _user
+
+
+logger = logging.getLogger('main')
 
 
 conf = ConnectionConfig(
@@ -14,7 +17,7 @@ conf = ConnectionConfig(
     MAIL_SERVER=mail_settings.MAIL_SERVER,
     MAIL_FROM_NAME=mail_settings.MAIL_FROM_NAME,
     MAIL_TLS=True,
-    MAIL_SSL=False,
+    MAIL_SSL=True,
     USE_CREDENTIALS=True
 )
 
@@ -24,7 +27,7 @@ def send_email_verification(email: _assets.Email, user: _user.UserInDB, bg: Back
     code = email.body['code']
 
     message = MessageSchema(
-        subject='Incedo Account Verification Code',
+        subject='Incedo Account Verification',
         recipients=email.dict().get('email'),
         html=f"""
         <html>
@@ -56,6 +59,7 @@ def send_email_verification(email: _assets.Email, user: _user.UserInDB, bg: Back
     fm = FastMail(conf)
 
     bg.add_task(fm.send_message, message=message)
+    logger.info('email verification sent ')
 
 
 def send_password_reset(email: _assets.Email, user: _user.UserInDB, bg: BackgroundTasks):
