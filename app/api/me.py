@@ -1,4 +1,5 @@
 import io
+import random
 from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException, Response, Body
 from starlette.responses import StreamingResponse
@@ -76,7 +77,8 @@ async def Get_Theme(
     
     user_id = Authorize.get_jwt_subject()
     if not user_id:
-        return crud.theme.get(db, model_id=1)
+        themes = crud.theme.get_multi(db)
+        return themes[random.randint(0, len(themes) - 1)]
 
     db_user = get_current_user(db, Authorize)
     db_theme = crud.theme.get(db, model_id=db_user.theme_id)

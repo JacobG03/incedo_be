@@ -11,12 +11,39 @@
     },
     {
       "name": "matrix",
-      "bg": "#000000",
+      "bg": "#222222",
       "main": "#15ff00",
       "sub": "003B00",
       "info": "#78c729",
       "text": "#adffa7",
       "error": "#da3333"
+    },
+    {
+      "name": "blueberry dark",
+      "bg": "#212b42",
+      "main": "#add7ff",
+      "sub": "#5c7da5",
+      "info": "#962f7e",
+      "text": "#91b4d5",
+      "error": "#df4576"
+    },
+    {
+      "name": "blueberry white",
+      "bg": "#dae0f5",
+      "main": "#506477",
+      "sub": "#92a4be",
+      "info": "#df4576",
+      "text": "#678198",
+      "error": "#df4576"
+    },
+    {
+      "name": "bushido",
+      "bg": "#242933",
+      "main": "#ec4c56",
+      "sub": "#596172",
+      "info": "#ec4c56",
+      "text": "#f6f0e9",
+      "error": "#ec4c56"
     }
   ]
 }
