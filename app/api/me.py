@@ -35,17 +35,6 @@ async def Delete_Account(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get('/avatar', tags=['Avatar'])
-async def Get_Avatar(
-        db: Session = Depends(get_db),
-        Authorize: AuthJWT = Depends()):
-
-    db_user = get_current_user(db, Authorize)
-    db_avatar = db.query(Avatar).get(db_user.avatar_id)
-
-    return StreamingResponse(io.BytesIO(db_avatar.content), media_type='image/png')
-
-
 @router.put('/avatar', tags=['Avatar'])
 async def Update_Avatar(
         avatar: UploadFile = File(..., media_type='image/png'),
@@ -75,6 +64,7 @@ async def Get_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
     
+    Authorize.jwt_optional()
     user_id = Authorize.get_jwt_subject()
     if not user_id:
         themes = crud.theme.get_multi(db)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 
 from app.core import settings
@@ -60,14 +60,15 @@ class UserInDB(UserBase):
 class MeOut(BaseModel):
     username: str
     is_verified: bool
-    avatar_id: int
+    avatar_id: str = Field(alias="avatar_url")
 
     @validator('avatar_id')
-    def return_avatar_url(cls, v):
-        return f'{settings.URL}/me/avatar'
+    def return_avatar_url(cls, v, values, **kwargs):
+        return f'{settings.URL}/users/{values["username"]}/avatar'
 
     class Config:
         orm_mode = True
+        allow_population_by_field_name = True
 
 
 class UserLogin(BaseModel):
