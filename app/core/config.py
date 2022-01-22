@@ -25,10 +25,10 @@ class Settings(BaseSettings):
     # API's
     MAX_PASS_RESET_ATTEMPTS: int = 5
     PASS_RESET_MINUTES: int = 10
-    
+
     # Workers
     REMOVE_PASS_RESETS_INTERVAL: int = 60 * 60
-    
+
     REMOVE_UNVERIFIED_INTERVAL: int = 60 * 60
     MAX_UNVERIFIED_TIME: int = 60 * 60 * 24
 
@@ -36,26 +36,23 @@ class Settings(BaseSettings):
     AVATAR_PATH: str = 'assets/images/default_avatar.jpg'
     AVATAR_SIZE: int = 256
     MAX_AVATAR_SIZE: int = 2000000       # 2MB
-    
+
     USERNAME_MIN_LENGTH: int = 3
     USERNAME_MAX_LENGTH: int = 32
     EMAIL_MAX_LENGTH: int = 256
     PASSWORD_MIN_LENGTH: int = 6
     PASSWORD_MAX_LENGTH: int = 256
-    
+
     class Config:
         env_file = ".env"
 
 
 class JWTSettings(BaseSettings):
     authjwt_secret_key: str
-    # Configure application to store and get JWT from cookies
     authjwt_token_location: set = {"cookies"}
-    # Only allow JWT cookies to be sent over https
     # authjwt_cookie_secure: bool = True
-    # Enable csrf double submit protection. default is True
+    authjwt_access_token_expires: int = 60 * 60
     authjwt_cookie_csrf_protect: bool = True
-
     # authjwt_cookie_domain: str = 'incedo.me'
 
     class Config:
@@ -72,7 +69,7 @@ class MailSettings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        
+
 
 class FirstAccount(BaseModel):
     username: str = os.environ.get('username')

@@ -2,14 +2,12 @@ import io
 import random
 from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Depends, status, File, UploadFile, HTTPException, Response, Body
-from starlette.responses import StreamingResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 
 from app import crud
 from app.schemas import _user, _assets
 from app.api.deps import get_current_user, get_db, get_verified_user
-from app.models import Avatar
 from app.core import settings
 
 
