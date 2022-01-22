@@ -63,7 +63,7 @@ async def Update_Avatar(
 async def Get_Theme(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
-    
+
     Authorize.jwt_optional()
     user_id = Authorize.get_jwt_subject()
     if not user_id:

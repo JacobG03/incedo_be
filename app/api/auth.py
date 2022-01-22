@@ -68,7 +68,7 @@ async def Create_User(
 
 
 @router.post('/login')
-def login(
+async def login(
         user: _user.UserLogin,
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
@@ -90,11 +90,24 @@ def login(
 
 
 @router.delete('/logout')
-def logout(Authorize: AuthJWT = Depends()):
+async def logout(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     Authorize.unset_jwt_cookies()
     return {"message": "Successfully logged out."}
+
+
+# Add refresh token route
+@router.get('/refresh')
+async def Refresh_Token(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_refresh_token_required()
+    
+    user_id = Authorize.get_jwt_subject()
+    access_token = Authorize.create_access_token(subject=user_id)
+    
+    Authorize.set_access_cookies(access_token)
+    
+    return {}
 
 
 @router.get('/send_verification')

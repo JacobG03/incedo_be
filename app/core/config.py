@@ -52,11 +52,11 @@ class JWTSettings(BaseSettings):
     # Configure application to store and get JWT from cookies
     authjwt_token_location: set = {"cookies"}
     # Only allow JWT cookies to be sent over https
-    authjwt_cookie_secure: bool = True
+    # authjwt_cookie_secure: bool = True
     # Enable csrf double submit protection. default is True
     authjwt_cookie_csrf_protect: bool = True
 
-    authjwt_cookie_domain: str = 'incedo.me'
+    # authjwt_cookie_domain: str = 'incedo.me'
 
     class Config:
         env_file = '.env'
