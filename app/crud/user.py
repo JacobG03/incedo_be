@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 
 from app.crud.base import CRUDBase
 from app.models import User, Avatar, EmailVerify, PasswordReset
-from app.schemas import _user
+from app.schemas import _user, _settings
 from app.utils import verify_password, get_password_hash
 from app.core import settings
 
 
-class CRUDUser(CRUDBase[User, _user.UserCreate, _user.UserUpdate]):
+class CRUDUser(CRUDBase[User, _user.UserCreate, _settings.UserUpdate]):
     def create(self, db: Session, *, obj_in: _user.UserCreate) -> _user.UserInDB:
         salt = bcrypt.gensalt().decode()
         hashed_password = get_password_hash(obj_in.password + salt)

@@ -1,6 +1,5 @@
 from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, validator
-from typing import Optional
 
 from app.core import settings
 
@@ -61,6 +60,7 @@ class MeOut(BaseModel):
     username: str
     is_verified: bool
     avatar_id: str = Field(alias="avatar_url")
+    email: str
 
     @validator('avatar_id')
     def return_avatar_url(cls, v, values, **kwargs):
@@ -74,11 +74,6 @@ class MeOut(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
-
-
-class UserUpdate(BaseModel):
-    username: Optional[str] = None
-    theme_id: Optional[int] = None
 
 
 class EmailVerifyDB(BaseModel):
