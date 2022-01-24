@@ -80,6 +80,11 @@ async def Update_Avatar(
     return Response(status_code=status.HTTP_200_OK)
 
 
+@router.get('/themes')
+async def Get_Themes(db: Session = Depends(get_db)):
+    return crud.theme.get_multi(db)
+
+
 @router.put('/theme', tags=['Theme'], response_model=_assets.Theme)
 async def Change_Theme(
         id: int = Body(..., embed=True),
