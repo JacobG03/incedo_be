@@ -3,3 +3,4 @@ venv/
 hide-fies.json
 sql_app.db
 __pycache__/
+.gitignore
