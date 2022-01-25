@@ -64,11 +64,10 @@ async def Update_Avatar(
         Authorize: AuthJWT = Depends()):
 
     if 'content-length' not in request.headers:
-        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED)
+        return Response(status_code=status.HTTP_411_LENGTH_REQUIRED)
     content_length = int(request.headers['content-length'])
     if content_length > settings.MAX_AVATAR_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     db_user = get_verified_user(db, Authorize)
 
