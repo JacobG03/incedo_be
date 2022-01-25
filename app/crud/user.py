@@ -2,6 +2,7 @@ import secrets
 import bcrypt
 import random
 from typing import BinaryIO, List, Optional
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
@@ -163,6 +164,33 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _settings.UserUpdate]):
         db.delete(db_reset_password)
         db.add(db_user)
         db.commit()
+
+        return True
+
+    def new_password(self, db: Session, db_user=_user.UserInDB, obj_in=_settings.UpdatePassword) -> bool:
+        if not verify_password(obj_in.password + db_user.salt,
+                               db_user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[
+                    {
+                        "loc": [
+                            "body",
+                            "password"
+                        ],
+                        "msg": "Invalid password."
+                    }
+                ]
+            )
+        salt = bcrypt.gensalt().decode()
+        hashed_password = get_password_hash(obj_in.new_password + salt)
+
+        db_user.salt = salt
+        db_user.hashed_password = hashed_password
+
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
 
         return True
 

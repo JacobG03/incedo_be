@@ -107,6 +107,19 @@ async def Change_Theme(
     return db_theme
 
 
+@router.put('/password')
+async def Change_Password(
+        updates: _settings.UpdatePassword,
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+
+    db_user = get_verified_user(db, Authorize)
+
+    crud.user.new_password(db, db_user=db_user, obj_in=updates)
+
+    return {'message': 'Password updated.'}
+
+
 class Responses(object):
     username_taken = {
         "loc": [
