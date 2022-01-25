@@ -71,8 +71,8 @@ async def Update_Avatar(
 
     db_user = get_verified_user(db, Authorize)
 
+    binary = await avatar.read()
     try:
-        binary = await avatar.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
