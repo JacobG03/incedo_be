@@ -2,6 +2,8 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, validator
 
 from app.core import settings
+from app.database import SessionLocal
+from app.models import Avatar
 
 
 class UserBase(BaseModel):
@@ -64,7 +66,9 @@ class MeOut(BaseModel):
 
     @validator('avatar_id')
     def return_avatar_url(cls, v, values, **kwargs):
-        return f'{settings.URL}/users/{values["username"]}/avatar'
+        db = SessionLocal()
+        avatar = db.query(Avatar).get(v)
+        return f'{settings.URL}/users/{values["username"]}/avatar/{avatar.uri}'
 
     class Config:
         orm_mode = True

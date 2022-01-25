@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+import secrets
 from PIL import Image
 from io import BytesIO
 from sqlalchemy.orm import Session
@@ -37,7 +38,7 @@ def setDefaultAvatar(db: Session) -> None:
             resized.save(output, 'png')
         data = output.getvalue()
 
-    db_avatar = Avatar(content=data)
+    db_avatar = Avatar(content=data, uri=secrets.token_urlsafe(16))
 
     db.add(db_avatar)
     db.commit()

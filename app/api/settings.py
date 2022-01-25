@@ -75,9 +75,9 @@ async def Update_Avatar(
     except UnidentifiedImageError:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    crud.user.update_avatar(db, content=byte_im, db_user=db_user)
+    db_avatar = crud.user.update_avatar(db, content=byte_im, db_user=db_user)
 
-    return Response(status_code=status.HTTP_200_OK)
+    return {'avatar_url': f'{settings.URL}/users/{db_user.username}/avatar/{db_avatar.uri}'}
 
 
 @router.get('/themes')

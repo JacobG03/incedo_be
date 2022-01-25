@@ -6,6 +6,7 @@ from app.database.base import Base
 class Avatar(Base):
     id = Column(Integer, primary_key=True, index=True)
     content = Column(LargeBinary)
+    uri = Column(String, nullable=False)
 
     def __repr__(self):
         return f'{self.id}'

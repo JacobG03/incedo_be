@@ -37,9 +37,10 @@ async def Get_User(
     return db_user
 
 
-@router.get('/{username}/avatar', tags=['Avatar'])
+@router.get('/{username}/avatar/{uri}', tags=['Avatar'])
 async def Get_User_Avatar(
         username: str,
+        uri: str,
         db: Session = Depends(get_db)):
 
     db_user = crud.user.get_by_username(db, username)
