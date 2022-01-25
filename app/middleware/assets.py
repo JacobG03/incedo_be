@@ -17,7 +17,7 @@ class LimitUploadSize(BaseHTTPMiddleware):
                 return Response(status_code=status.HTTP_411_LENGTH_REQUIRED)
             content_length = int(request.headers['content-length'])
             if content_length > self.max_upload_size:
-                return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                                headers={'Access-Control-Allow-Origin': '*'})
+                await request.close()
+                return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
         return await call_next(request)
