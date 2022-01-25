@@ -57,22 +57,22 @@ async def Update_Email(
 
 
 @router.put('/avatar', tags=['Avatar'])
-def Update_Avatar(
+async def Update_Avatar(
         request: Request,
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
     
     if 'content-length' not in request.headers:
-        return Response(status_code=status.HTTP_411_LENGTH_REQUIRED)
+        raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED)
     content_length = int(request.headers['content-length'])
     if content_length > settings.MAX_AVATAR_SIZE:
-        return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     db_user = get_verified_user(db, Authorize)
 
     try:
-        binary = avatar.read()
+        binary = await avatar.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
