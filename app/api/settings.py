@@ -62,17 +62,18 @@ async def Update_Avatar(
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
-    
+
     if 'content-length' not in request.headers:
         raise HTTPException(status_code=status.HTTP_411_LENGTH_REQUIRED)
     content_length = int(request.headers['content-length'])
     if content_length > settings.MAX_AVATAR_SIZE:
-        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     db_user = get_verified_user(db, Authorize)
 
-    binary = await avatar.read()
     try:
+        binary = await avatar.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
@@ -82,9 +83,9 @@ async def Update_Avatar(
     except UnidentifiedImageError:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-    db_avatar = crud.user.update_avatar(db, content=byte_im, db_user=db_user)
+    crud.user.update_avatar(db, content=byte_im, db_user=db_user)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content={'avatar_url': f'{settings.URL}/users/{db_user.username}/avatar/{db_avatar.uri}'})
+    return Response(status_code=status.HTTP_200_OK)
 
 
 @router.get('/themes')

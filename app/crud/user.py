@@ -78,7 +78,7 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _settings.UserUpdate]):
             return None
         return user
 
-    def update_avatar(self, db: Session, content: BinaryIO, db_user: _user.UserInDB) -> Avatar:
+    def update_avatar(self, db: Session, content: BinaryIO, db_user: _user.UserInDB) -> bool:
         db_avatar = db.query(Avatar).get(db_user.avatar_id)
         db_avatar.content = content
         db_avatar.uri = secrets.token_urlsafe(16)
@@ -87,7 +87,7 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _settings.UserUpdate]):
         db.commit()
         db.refresh(db_avatar)
 
-        return db_avatar
+        return True
 
     def generate_code(self, db: Session, user_id: int) -> _user.EmailVerifyDB:
         db_ver = db.query(EmailVerify).filter(
