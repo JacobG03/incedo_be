@@ -57,7 +57,7 @@ async def Update_Email(
 
 
 @router.put('/avatar', tags=['Avatar'])
-async def Update_Avatar(
+def Update_Avatar(
         request: Request,
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
@@ -72,7 +72,7 @@ async def Update_Avatar(
     db_user = get_verified_user(db, Authorize)
 
     try:
-        binary = await avatar.read()
+        binary = avatar.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
