@@ -13,7 +13,7 @@
       "name": "matrix",
       "bg": "#222222",
       "main": "#15ff00",
-      "sub": "003B00",
+      "sub": "#003B00",
       "info": "#78c729",
       "text": "#adffa7",
       "error": "#da3333"
