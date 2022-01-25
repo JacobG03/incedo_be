@@ -7,7 +7,6 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 
 from app.core import settings, LogConfig
-from app.middleware import LimitUploadSize
 from app.api import api_router
 
 
@@ -23,8 +22,7 @@ origins = [
 middleware = [
     Middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True,
                allow_methods=["*"],
-               allow_headers=["*"]),
-    Middleware(LimitUploadSize, max_upload_size=settings.MAX_AVATAR_SIZE)
+               allow_headers=["*"])
 ]
 
 app = FastAPI(title=settings.PROJECT_NAME, middleware=middleware)
@@ -39,7 +37,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
         content={"detail": exc.message}
     )
 
-from app import workers
+from app.workers import user
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

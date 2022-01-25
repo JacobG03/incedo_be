@@ -1,7 +1,6 @@
 import io
 from PIL import Image, UnidentifiedImageError
-from charset_normalizer import logging
-from fastapi import APIRouter, Body, Depends, File, UploadFile, status, HTTPException
+from fastapi import APIRouter, Body, Depends, File, Request, UploadFile, status, HTTPException, Response
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
@@ -13,7 +12,6 @@ from app.utils.hashing import verify_password
 from .deps import get_current_user, get_db, get_verified_user
 
 
-logger = logging.getLogger('main')
 router = APIRouter()
 
 
@@ -60,12 +58,18 @@ async def Update_Email(
 
 @router.put('/avatar', tags=['Avatar'])
 async def Update_Avatar(
+        request: Request,
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    logger.info('Update avatar route')
     db_user = get_verified_user(db, Authorize)
+
+    if 'content-length' not in request.headers:
+        return Response(status_code=status.HTTP_411_LENGTH_REQUIRED)
+    content_length = int(request.headers['content-length'])
+    if content_length > settings.MAX_AVATAR_SIZE:
+        return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     try:
         binary = avatar.file.read()
