@@ -1,5 +1,0 @@
-venv/
-.env
-hide-fies.json
-sql_app.db
-__pycache__/
