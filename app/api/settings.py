@@ -62,6 +62,8 @@ async def Update_Avatar(
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
+    
+    binary = await avatar.read()
 
     db_user = get_verified_user(db, Authorize)
 
@@ -72,7 +74,6 @@ async def Update_Avatar(
         return Response(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
 
     try:
-        binary = avatar.file.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
