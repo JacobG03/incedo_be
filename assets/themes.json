@@ -40,10 +40,55 @@
       "name": "bushido",
       "bg": "#242933",
       "main": "#ec4c56",
-      "sub": "#596172",
+      "sub": "#f6f0e9",
       "info": "#ec4c56",
-      "text": "#f6f0e9",
+      "text": "#596172",
       "error": "#ec4c56"
+    },
+    {
+      "name": "boujee",
+      "bg": "#1E1B18",
+      "main": "#265ce1",
+      "sub": "#3E92CC",
+      "info": "#FFFAFF",
+      "text": "#85776a",
+      "error": "#D8315B"
+    },
+    {
+      "name": "space cadet",
+      "bg": "#1B2845",
+      "main": "#65AFFF",
+      "sub": "#5899E2",
+      "info": "#5da1de",
+      "text": "#8193aa",
+      "error": "#ec4c56"
+    },
+    {
+      "name": "jungle",
+      "bg": "#204E4A",
+      "main": "#81C14B",
+      "sub": "#2E933C",
+      "info": "#4bc47b",
+      "text": "#4fc8be",
+      "error": "#ECBA82"
+    },
+    {
+      "name": "rich",
+      "bg": "#153131",
+      "main": "#57E2E5",
+      "sub": "#45CB85",
+      "info": "#7e94f2",
+      "text": "#8fbfbf",
+      "error": "#E08DAC"
+    },
+    {
+      "name": "velvety",
+      "bg": "#FFFFFF",
+      "main": "#94D1BE",
+      "sub": "#3B413C",
+      "info": "#517571",
+      "text": "#6c7776",
+      "error": "#EF3550"
     }
   ]
 }
