@@ -2,6 +2,7 @@ from http.client import HTTPException
 import io
 from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Body, Depends, File, Response, UploadFile, status, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
 from app import crud
@@ -57,7 +58,7 @@ async def Update_Email(
 
 
 @router.put('/avatar', tags=['Avatar'])
-def Update_Avatar(
+async def Update_Avatar(
         avatar: UploadFile = File(...),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
@@ -65,7 +66,7 @@ def Update_Avatar(
     db_user = get_verified_user(db, Authorize)
 
     try:
-        binary = avatar.read()
+        binary = await avatar.read()
         image = Image.open(io.BytesIO(binary))
         im_resized = image.resize(
             size=(settings.AVATAR_SIZE, settings.AVATAR_SIZE))
@@ -77,7 +78,7 @@ def Update_Avatar(
 
     db_avatar = crud.user.update_avatar(db, content=byte_im, db_user=db_user)
 
-    return {'avatar_url': f'{settings.URL}/users/{db_user.username}/avatar/{db_avatar.uri}'}
+    return JSONResponse(status_code=status.HTTP_200_OK, content={'avatar_url': f'{settings.URL}/users/{db_user.username}/avatar/{db_avatar.uri}'})
 
 
 @router.get('/themes')
