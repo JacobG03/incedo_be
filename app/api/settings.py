@@ -1,7 +1,6 @@
-from http.client import HTTPException
 import io
 from PIL import Image, UnidentifiedImageError
-from fastapi import APIRouter, Body, Depends, File, Response, UploadFile, status, HTTPException
+from fastapi import APIRouter, Body, Depends, File, UploadFile, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.orm import Session
