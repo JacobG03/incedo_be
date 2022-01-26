@@ -26,18 +26,18 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def get_multi(self, db: Session, *, reverse: bool = False, skip: int = 0, limit: int = 100) -> List[ModelType]:
         if reverse:
-            db_users = db.query(self.model).order_by(self.model.id.desc()).limit(limit)
-            db_users = db_users[skip::1]
+            db_obj = db.query(self.model).order_by(self.model.id.desc()).limit(limit)
+            db_obj = db_obj[skip::1]
         else:
-            db_users = db.query(self.model).offset(skip).limit(limit).all()
+            db_obj = db.query(self.model).offset(skip).limit(limit).all()
             
-        return db_users
+        return db_obj
 
     def get_multi_last(self, db: Session, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
-        db_users = db.query(self.model).order_by(
+        db_obj = db.query(self.model).order_by(
             self.model.id.desc()).limit(limit)
-        db_users = db_users[skip::1]
-        return db_users
+        db_obj = db_obj[skip::1]
+        return db_obj
 
     def create(self, db: Session, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in)
