@@ -20,6 +20,18 @@ async def Get_Notes(
     return crud.note.get_multi(db, db_user=db_user)
 
 
+@router.get('/{id}', response_model=_note.NoteOut)
+async def Get_Note(
+        id: int,
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+
+    get_note_author(db, Authorize, id)
+    db_note = crud.note.get(db, id)
+
+    return db_note
+
+
 @router.post('', response_model=_note.NoteOut)
 async def Create_Note(
         note_in: _note.Note,
