@@ -50,10 +50,10 @@ class Settings(BaseSettings):
 class JWTSettings(BaseSettings):
     authjwt_secret_key: str
     authjwt_token_location: set = {"cookies"}
-    authjwt_cookie_secure: bool = True
+    # authjwt_cookie_secure: bool = True
     authjwt_access_token_expires: int = 60 * 60
     authjwt_cookie_csrf_protect: bool = True
-    authjwt_cookie_domain: str = 'incedo.me'
+    # authjwt_cookie_domain: str = 'incedo.me'
 
     class Config:
         env_file = '.env'

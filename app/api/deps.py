@@ -36,6 +36,8 @@ def get_verified_user(db: Session, Authorize: AuthJWT) -> _user.UserInDB:
 def get_note_author(db: Session, Authorize: AuthJWT, id: int) -> _user.UserInDB:
     db_user = get_verified_user(db, Authorize)
     db_note = crud.note.get(db, id)
+    if not db_note:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     if db_user.id != db_note.user_id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return db_user
