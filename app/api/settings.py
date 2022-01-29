@@ -22,13 +22,8 @@ async def Update_Username(
         Authorize: AuthJWT = Depends()):
 
     db_user = get_verified_user(db, Authorize)
-    if crud.user.get_by_username(db, update.username):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[Responses.username_taken]
-        )
 
-    crud.user.update(db, db_obj=db_user, obj_in=update)
+    crud.user.update_username(db, db_user, update)
 
     return {'message': 'Username updated successfully.'}
 
@@ -40,18 +35,8 @@ async def Update_Email(
         Authorize: AuthJWT = Depends()):
 
     db_user = get_verified_user(db, Authorize)
-    if crud.user.get_by_email(db, update.email):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[Responses.username_taken]
-        )
-
-    if not verify_password(update.password + db_user.salt, db_user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[Responses.invalid_password]
-        )
-    crud.user.update(db, db_obj=db_user, obj_in=update)
+    
+    crud.user.update_email(db, db_user=db_user, update=update)
 
     return {'message': 'Email updated successfully.'}
 

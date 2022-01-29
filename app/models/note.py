@@ -25,8 +25,8 @@ class Section(Base):
     sort_id = Column(Integer, nullable=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     parent_id = Column(Integer, ForeignKey('section.id'), nullable=True)
-    notes = relationship('Note', backref='section')
-    sub_sections = relationship('Section')
+    notes = relationship('Note', backref='section', cascade="all, delete-orphan")
+    sub_sections = relationship('Section', cascade="all, delete-orphan")
     
     def __repr__(self):
         return f'{self.id}, {self.name}'

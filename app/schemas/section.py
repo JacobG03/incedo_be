@@ -37,6 +37,11 @@ class SectionOut(BaseModel):
 
     class Config:
         orm_mode = True
+        
+
+class SectionRemove(BaseModel):
+    notes: Optional[List[int]] = None
+    sub_sections: Optional[List[int]] = None
 
 
 SectionDB.update_forward_refs()

@@ -12,8 +12,9 @@ from app.crud.section import section
 class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
     def create(self, db: Session, db_user: _user.UserInDB, note_in: _note.Note) -> _note.NoteDB:
         if note_in.section_id:
-            section_db = section.get(db, db_user, note_in.section_id)
-            if not section_db:
+            try:
+                section.get(db, db_user, note_in.section_id)
+            except HTTPException:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=[{
@@ -32,7 +33,16 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
 
         return db_note
 
-    def get_multi(self, db: Session, db_user=_user.UserInDB, reverse: bool = False, skip: int = 0, limit: int = 100) -> List[ModelType]:
+    def get(self, db: Session, db_user: _user.UserInDB, note_id: int) -> _note.NoteDB:
+        db_note = db.query(self.model).filter(
+            self.model.user_id.like(db_user.id),
+            self.model.id.like(note_id)).one_or_none()
+        if not db_note:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        return db_note
+
+    def get_multi(self, db: Session, db_user: _user.UserInDB, reverse: bool = False, skip: int = 0, limit: int = 100) -> List[ModelType]:
         if reverse:
             db_obj = db.query(self.model).filter(
                 self.model.user_id == db_user.id).order_by(self.model.id.desc()).limit(limit)
@@ -43,10 +53,11 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
 
         return db_obj
 
-    def update(self, db: Session, db_note: _note.NoteDB, note_in: _note.NoteUpdate) -> ModelType:
+    def update(self, db: Session, db_user: _user.UserInDB, db_note: _note.NoteDB, note_in: _note.NoteUpdate) -> ModelType:
         if note_in.section_id:
-            section_db = section.get(db, note_in.section_id)
-            if not section_db:
+            try:
+                section.get(db, db_user, note_in.section_id)
+            except HTTPException:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail=[{
@@ -71,6 +82,18 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
         db.commit()
         db.refresh(db_note)
         return db_note
+    
+    def remove(self, db: Session, db_user: _user.UserBase, note_id: int) -> None:
+        db_note = db.query(self.model).filter(
+            self.model.user_id.like(db_user.id),
+            self.model.id.like(note_id)).one_or_none()
+        if not db_note:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        db.delete(db_note)
+        db.commit()
+        
+        return
 
 
 note = CrudNote(Note)

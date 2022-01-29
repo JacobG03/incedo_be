@@ -195,6 +195,56 @@ class CRUDUser(CRUDBase[User, _user.UserCreate, _settings.UserUpdate]):
         db.refresh(db_user)
 
         return True
+    
+    def update_username(self, db: Session, db_user: _user.UserInDB, update: _settings.UsernameUpdate) -> None:
+        username_taken = db.query(self.model).filter(self.model.username == update.username).one_or_none()
+        if username_taken:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[{
+                    'loc': [
+                        'body',
+                        'username'
+                    ],
+                    'msg': 'Username is not available.'
+                }])
+        
+        db_user.username = update.username
+        db.add(db_user)
+        db.commit()
 
+        return
+    
+    def update_email(self, db: Session, db_user: _user.UserInDB, update: _settings.EmailUpdate) -> None:
+        email_taken = db.query(self.model).filter(self.model.email == update.email).one_or_none()
+        if email_taken:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[{
+                    'loc': [
+                        'body',
+                        'email'
+                    ],
+                    'msg': "Email is not available."
+                }]
+            )
+        
+        if not verify_password(update.password + db_user.salt, db_user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=[{
+                    'loc': [
+                        'body',
+                        'password'
+                    ],
+                    'msg': 'Invalid password.'
+                }]
+            )
+        
+        db_user.email = update.email
+        db.add(db_user)
+        db.commit()
+        
+        return
 
 user = CRUDUser(User)
