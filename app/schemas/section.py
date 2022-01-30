@@ -16,6 +16,8 @@ class SectionUpdate(BaseModel):
     parent_id: Optional[int] = None
     sort_id: Optional[int] = None
 
+    class Config:
+        orm_mode = True
 
 class SectionDB(Section):
     id: int

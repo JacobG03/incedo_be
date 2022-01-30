@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from .base import CRUDBase
@@ -59,6 +60,47 @@ class CRUDSection(CRUDBase[Section, _section.Section, _section.SectionUpdate]):
         db.commit()
 
         return
+    
+    def update(self, db: Session, db_user: _user.UserInDB, section_id: int, section_in: _section.SectionUpdate) -> _section.SectionDB:
+        db_section = self.get(db, db_user, section_id)
+        if section_in.parent_id:
+            if section_in.parent_id == db_section.id:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=[{
+                        'loc': [
+                            'body',
+                            'parent_id'
+                        ],
+                        'msg': 'Parent cannot == this section.'
+                    }]
+                )
+            try:
+                self.get(db, db_user, section_in.parent_id)
+            except HTTPException:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=[{
+                        'loc': [
+                            'body',
+                            'parent_id'
+                        ],
+                        'msg': 'Parent does not exist.'
+                    }]
+                )
+        # Validate stuff if needed -> test
+        
+        obj_data = jsonable_encoder(section_in)
+        update_data = section_in.dict(exclude_unset=True)
+        for field in obj_data:
+            if field in update_data:
+                setattr(db_section, field, update_data[field])
+
+        db.add(db_section)
+        db.commit()
+        db.refresh(db_section)
+        
+        return db_section
 
 
 section = CRUDSection(Section)

@@ -22,6 +22,18 @@ async def Create_Section(
     return crud.section.create(db, db_user, section_in)
 
 
+@router.put('/{section_id}', response_model=_section.SectionUpdate)
+async def Update_Section(
+        section_id: int,
+        section_in: _section.SectionUpdate,
+        db: Session = Depends(get_db),
+        Authorize: AuthJWT = Depends()):
+
+    db_user = get_verified_user(db, Authorize)
+
+    return crud.section.update(db, db_user, section_id, section_in)
+
+
 @router.get('/{id}', response_model=_section.SectionOut)
 async def Get_Section(
         id: int,
