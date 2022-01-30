@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
-from typing import Any, List, Dict, Optional
+from typing import Optional
 
 
 class Note(BaseModel):
@@ -16,6 +16,9 @@ class NoteUpdate(BaseModel):
     section_id: Optional[int] = None
     sort_id: Optional[int] = None
     favorite: Optional[bool] = None
+    
+    class Config:
+        orm_mode = True
 
 
 class NoteOut(Note):

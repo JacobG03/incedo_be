@@ -48,7 +48,7 @@ async def Create_Note(
     return crud.note.create(db, db_user, note_in)
 
 
-@router.put('/{id}', response_model=_note.NoteOut)
+@router.put('/{id}', response_model=_note.NoteUpdate)
 async def Update_Note(
         id: int,
         note_in: _note.NoteUpdate,
