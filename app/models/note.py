@@ -13,7 +13,8 @@ class Note(Base):
     favorite = Column(Boolean, default=False, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
-    section_id = Column(Integer, ForeignKey('section.id'), nullable=True)
+    parent_id = Column(Integer, ForeignKey('section.id'), nullable=True)
+    modified = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self):
         return f'{self.id}, {self.title}'
@@ -22,11 +23,13 @@ class Note(Base):
 class Section(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
+    favorite = Column(Boolean, default=False, nullable=False)
     sort_id = Column(Integer, nullable=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
     parent_id = Column(Integer, ForeignKey('section.id'), nullable=True)
     notes = relationship('Note', backref='section', cascade="all, delete-orphan")
     sub_sections = relationship('Section', cascade="all, delete-orphan")
+    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
     
     def __repr__(self):
         return f'{self.id}, {self.name}'

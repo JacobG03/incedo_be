@@ -189,8 +189,7 @@ async def Reset_Passwords_Via_Email(
         passwords: _user.ResetPasswords,
         db: Session = Depends(get_db)):
 
-    if not crud.user.reset_password(db, passwords, uri):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    crud.user.reset_password(db, passwords, uri)
 
     return Response(status_code=status.HTTP_200_OK)
 

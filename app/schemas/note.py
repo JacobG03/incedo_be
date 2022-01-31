@@ -6,14 +6,14 @@ from typing import Optional
 class Note(BaseModel):
     title: Optional[str] = None
     body: str
-    section_id: Optional[int] = None
-    sort_id: Optional[int] = None
+    parent_id: Optional[int] = None
+    sort_id: int
 
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     body: Optional[str] = None
-    section_id: Optional[int] = None
+    parent_id: Optional[int] = None
     sort_id: Optional[int] = None
     favorite: Optional[bool] = None
     
@@ -24,8 +24,8 @@ class NoteUpdate(BaseModel):
 class NoteOut(Note):
     id: int
     timestamp: datetime
-    sort_id: Optional[int] = None
     favorite: Optional[bool] = None
+    modified: datetime
 
     class Config:
         orm_mode = True

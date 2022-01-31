@@ -11,9 +11,9 @@ from app.crud.section import section
 
 class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
     def create(self, db: Session, db_user: _user.UserInDB, note_in: _note.Note) -> _note.NoteDB:
-        if note_in.section_id:
+        if note_in.parent_id:
             try:
-                section.get(db, db_user, note_in.section_id)
+                section.get(db, db_user, note_in.parent_id)
             except HTTPException:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

@@ -9,12 +9,9 @@
 
 - [ ] Tests
 
-## Ideas
+## Today
 
-- [ ] Generate favicon based on 'bg' and main 'colors' (letter 'i' in a circle is enough)
-
-## Later
-
-- [ ] Endpoints
-  - [ ] /Settings
-  - [ ] /notes
+- [x] PUT section method
+- [ ] Build functional UI
+- [ ] Collab
+- [ ] UI Collab
