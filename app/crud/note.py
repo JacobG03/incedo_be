@@ -1,10 +1,11 @@
+from datetime import datetime
 from typing import List
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.encoders import jsonable_encoder
 
 from app.crud.base import CRUDBase, ModelType
-from app.models import Note, Section
+from app.models import Note
 from app.schemas import _note, _user
 from app.crud.section import section
 
@@ -54,9 +55,9 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
         return db_obj
 
     def update(self, db: Session, db_user: _user.UserInDB, db_note: _note.NoteDB, note_in: _note.NoteUpdate) -> ModelType:
-        if note_in.section_id:
+        if note_in.parent_id:
             try:
-                section.get(db, db_user, note_in.section_id)
+                section.get(db, db_user, note_in.parent_id)
             except HTTPException:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -68,6 +69,9 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
                         'msg': 'Section does not exist.'
                     }]
                 )
+            db_section = section.get(db, db_user, note_in.parent_id)
+            db_section.modified = datetime.utcnow()
+            db.add(db_section)
 
         obj_data = jsonable_encoder(note_in)
         if isinstance(note_in, dict):
@@ -77,7 +81,9 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
         for field in obj_data:
             if field in update_data:
                 setattr(db_note, field, update_data[field])
-
+        
+        db_note.modified = datetime.utcnow()
+        
         db.add(db_note)
         db.commit()
         db.refresh(db_note)
@@ -94,6 +100,5 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
         db.commit()
         
         return
-
-
+    
 note = CrudNote(Note)

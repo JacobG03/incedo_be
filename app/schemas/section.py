@@ -9,27 +9,31 @@ class Section(BaseModel):
     name: str
     user_id: Optional[int] = None
     parent_id: Optional[int] = None
-    sort_id: int
     favorite: Optional[bool] = None
 
 
 class SectionUpdate(BaseModel):
     name: Optional[str]
     parent_id: Optional[int] = None
-    sort_id: Optional[int] = None
     favorite: Optional[bool] = None
 
     class Config:
         orm_mode = True
+
 
 class SectionDB(Section):
     id: int
     notes: List[NoteDB]
     sub_sections: List[SectionDB]
     timestamp: datetime
-    
+    modified: datetime
+
     @validator('timestamp')
     def timestamp_seconds(cls, v: datetime):
+        return v.timestamp()
+
+    @validator('modified')
+    def modified_seconds(cls, v: datetime):
         return v.timestamp()
 
     class Config:
@@ -41,11 +45,15 @@ class SectionOut(BaseModel):
     name: str
     favorite: bool
     parent_id: Optional[int] = None
-    sort_id: int
     timestamp: datetime
-    
+    modified: datetime
+
     @validator('timestamp')
     def timestamp_seconds(cls, v: datetime):
+        return v.timestamp()
+
+    @validator('modified')
+    def modified_seconds(cls, v: datetime):
         return v.timestamp()
     
     class Config:
