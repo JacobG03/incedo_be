@@ -73,15 +73,15 @@ async def login(
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
-    user = crud.user.authenticate(db, user.email, user.password)
-    if not user:
+    db_user = crud.user.authenticate(db, user.email, user.password)
+    if not db_user:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=Responses.login_fail
         )
     # Create the tokens and passing to set_access_cookies or set_refresh_cookies
-    access_token = Authorize.create_access_token(subject=user.id)
-    refresh_token = Authorize.create_refresh_token(subject=user.id)
+    access_token = Authorize.create_access_token(subject=db_user.id, user_claims={'email': db_user.email})
+    refresh_token = Authorize.create_refresh_token(subject=db_user.id, user_claims={'email': db_user.email})
     # Set the JWT and CSRF double submit cookies in the response
 
     Authorize.set_access_cookies(access_token)
