@@ -90,9 +90,7 @@ class CrudNote(CRUDBase[Note, _note.Note, _note.NoteUpdate]):
         return db_note
     
     def remove(self, db: Session, db_user: _user.UserBase, note_id: int) -> None:
-        db_note = db.query(self.model).filter(
-            self.model.user_id.like(db_user.id),
-            self.model.id.like(note_id)).one_or_none()
+        db_note = self.get(db, db_user, note_id)
         if not db_note:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         
