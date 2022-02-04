@@ -12,6 +12,8 @@ class Note(BaseModel):
     def valid_title(cls, v):
         if len(v) < 1:
             raise ValueError('Title is too short.')
+        elif len(v) > 100:
+            raise ValueError('Title is too long.')
         return v
 
 
@@ -23,6 +25,14 @@ class NoteUpdate(BaseModel):
     
     class Config:
         orm_mode = True
+
+    @validator('title')
+    def valid_title(cls, v):
+        if len(v) < 1:
+            raise ValueError('Title is too short.')
+        elif len(v) > 100:
+            raise ValueError('Title is too long.')
+        return v
 
 
 class NoteOut(Note):

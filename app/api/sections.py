@@ -61,14 +61,10 @@ async def Get_Sections(
 @router.delete('/{section_id}')
 async def Delete_Section(
         section_id: int,
-        agreed: bool = Body(..., embed=True),
         db: Session = Depends(get_db),
         Authorize: AuthJWT = Depends()):
 
     db_user = get_verified_user(db, Authorize)
-    
-    if not agreed:
-        return Response(status_code=status.HTTP_403_FORBIDDEN)
         
     db_section = crud.section.get(db, db_user, section_id)
     crud.section.remove(db, db_user, db_section)
