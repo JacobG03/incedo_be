@@ -33,9 +33,9 @@ class CRUDSection(CRUDBase[Section, _section.Section, _section.SectionUpdate]):
 
     def get(self, db: Session, db_user: _user.UserInDB, section_id: int)\
         -> Optional[_section.SectionDB]:
-        db_section = db.query(self.model).filter(
-            self.model.user_id.like(db_user.id),
-            self.model.id.like(section_id)).one_or_none()
+        db_section = db.query(self.model).filter_by(
+            user_id = db_user.id,
+            id = section_id).one_or_none()
         if not db_section:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return db_section
